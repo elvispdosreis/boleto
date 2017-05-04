@@ -40,17 +40,12 @@ class Bradesco extends AbstractBank implements InterfaceBank
         $valor = $this->getValorBoleto();
         $fatorvencimento = $this->fatorVencimento($this->vencimento);
 
-
         // 43 numeros para o calculo do digito verificador do codigo de barras
         $dv = $this->dvBarra($this->codigobanco.$this->nummoeda.$fatorvencimento.$valor.$this->agencia.$this->nossonumero.$this->contacedente.'0', 9, 0);
+
         // Numero para o codigo de barras com 44 digitos
         $this->codigobarras = $this->codigobanco.$this->nummoeda.$dv.$fatorvencimento.$valor.$this->agencia.$this->nossonumero.$this->contacedente.'0';
-
-
-       // $agencia_codigo = $this->agencia . "-" . $this->agenciadigito . " / " . $this->contacedente . "-" . $this->contacedentedigito;
-
     }
-
 
     public function getVencimento()
     {
@@ -160,6 +155,10 @@ class Bradesco extends AbstractBank implements InterfaceBank
         return $this->contacedente;
     }
 
+    private function getValorBoleto()
+    {
+        return $this->formata_numero(number_format($this->valor, 2, ',', ''),10,0,"valor");
+    }
 
     protected function dvNossonumero($numero)
     {
@@ -173,11 +172,6 @@ class Bradesco extends AbstractBank implements InterfaceBank
             $dv = $digito;
         }
         return $dv;
-    }
-
-    private function getValorBoleto()
-    {
-        return $this->formata_numero(number_format($this->valor, 2, ',', ''),10,0,"valor");
     }
 
     protected function dvBarra($numero) {
