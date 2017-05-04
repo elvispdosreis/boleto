@@ -212,15 +212,9 @@ class AbstractBank
 
     protected function vencimentoJuliano(\DateTime $date)
     {
-        $dias = $date->format('z') + 1;
+        $dias = (int)$date->format('z') + 1;
         $year = $date->format('y');
         return str_pad($dias, 3, '0', STR_PAD_LEFT) . substr($year, -1);
-    }
-
-
-    public function getValorBoleto()
-    {
-        return $this->formata_numero(number_format($this->valor, 2, ',', ''), 10, 0, "valor");
     }
 
     public function __destruct()

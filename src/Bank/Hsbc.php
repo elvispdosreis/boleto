@@ -12,15 +12,18 @@ namespace Boleto\Bank;
 class Hsbc extends AbstractBank implements InterfaceBank
 {
 
-    private $vencimento = '';
-    private $valor = '';
-    private $codigocedente = '';
-    private $nossonumero = '';
+
+    /**
+     * @var \DateTime
+     */
+    private $vencimento = null;
+    private $valor;
+    private $codigocedente;
+    private $nossonumero;
     private $codigobanco = '399';
     private $carteira = 'CNR';
     private $nummoeda = "9";
 
-    private $linhadigitavel;
     private $codigobarras;
 
     function __construct(\DateTime $vencimento = null, $valor = null, $nossonumero, $carteira, $cedente)
@@ -45,42 +48,22 @@ class Hsbc extends AbstractBank implements InterfaceBank
         $this->codigobarras = substr($linha,0,4).$this->dvBarra($linha).substr($linha,4,43);
     }
 
-    public function setVencimento(\DateTime $date)
-    {
-        $this->vencimento = $date;
-        return $this;
-    }
 
     public function getVencimento()
     {
-        return $this->vencimento->format('d/m/Y');
+        return $this->vencimento;
     }
 
-    public function setValor($valor)
+    public function getValor()
     {
-        $this->valor = $valor;
-        return $this;
-    }
-
-    public function getValorBoleto()
-    {
-        return $this->formata_numero(number_format($this->valor, 2, ',', ''),10,0,"valor");;
-    }
-
-
-    public function setNossoNumero($nossonumero)
-    {
-        //nosso número com maximo de 13 digitos
-        $this->nossonumero = $this->formata_numero($nossonumero, 13, 0);
-        return $this;
+        return $this->valor;
     }
 
     public function getNossoNumero()
     {
         // nosso número (com dvs) é 16 digitos
-        return $this->geraNossoNumero($this->nossonumero,$this->codigocedente,$this->vencimento,'4');;
+        return $this->geraNossoNumero($this->nossonumero,$this->codigocedente,$this->vencimento,'4');
     }
-
 
     public function getLinhaDigitavel()
     {
@@ -92,15 +75,34 @@ class Hsbc extends AbstractBank implements InterfaceBank
         return $this->codigobarras;
     }
 
+    public function getCarteira()
+    {
+        return $this->carteira;
+    }
+
+    public function setVencimento(\DateTime $date)
+    {
+        $this->vencimento = $date;
+        return $this;
+    }
+
+    public function setValor($valor)
+    {
+        $this->valor = $valor;
+        return $this;
+    }
+
+    public function setNossoNumero($nossonumero)
+    {
+        //nosso número com maximo de 13 digitos
+        $this->nossonumero = $this->formata_numero($nossonumero, 13, 0);
+        return $this;
+    }
+
     public function setCarteira($carteira)
     {
         $this->carteira = $carteira;
         return $this;
-    }
-
-    public function getCarteira()
-    {
-        return $this->carteira;
     }
 
     public function setCodigoCedente($cedente)
@@ -110,9 +112,14 @@ class Hsbc extends AbstractBank implements InterfaceBank
         return $this;
     }
 
-    public function getCodigoCedente($cedente)
+    public function getCodigoCedente()
     {
         return $this->codigocedente;
+    }
+
+    private function getValorBoleto()
+    {
+        return $this->formata_numero(number_format($this->valor, 2, ',', ''),10,0,"valor");
     }
 
     protected function dvBarra($numero)
@@ -234,7 +241,7 @@ class Hsbc extends AbstractBank implements InterfaceBank
     {
         $ndoc = $ndoc . $this->modulo_11_invertido($ndoc) . $tipoid;
         $venc = substr($venc, 0, 2) . substr($venc, 3, 2) . substr($venc, 8, 2);
-        $res = $ndoc + $cedente + $venc;
+        $res = $ndoc . $cedente . $venc;
         return $ndoc . $this->modulo_11_invertido($res);
     }
 
