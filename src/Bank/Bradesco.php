@@ -9,68 +9,159 @@
 namespace Boleto\Bank;
 
 
-class Bradesco extends AbstractBank
+class Bradesco extends AbstractBank implements InterfaceBank
 {
+    /**
+     * @var \DateTime
+     */
+    private $vencimento = '';
+    private $valor = '';
+    private $agencia = '';
+    private $agenciadigito = '';
+    private $conta = '';
+    private $contadigito = '';
+    private $contacedente = '';
+    private $contacedentedigito = '';
+    private $nossonumero = '';
+    private $codigobanco = '237';
+    private $carteira = '09';
+    private $nummoeda = "9";
 
-    public $vencimento = '';
-    public $valor = '';
-    public $agencia = '';
-    public $agenciadigito = '';
-    public $conta = '';
-    public $contadigito = '';
-    public $agenciacedente = '';
-    public $agenciacedentedigito = '';
-    public $contacedente = '';
-    public $contacedentedigito = '';
-    public $nossonumero = '';
-    public $codigobanco = '237';
-    public $carteira = '09';
-    public $nummoeda = "9";
-
-    function __construct()
+    function __construct(\DateTime $vencimento = null, $valor = null, $nossonumero, $carteira, $agencia, $conta, $contacedente)
     {
-    }
+        $this->setVencimento($vencimento);
+        $this->setValor($valor);
+        $this->setNossoNumero($nossonumero, $carteira);
+        $this->setCarteira($carteira);
+        $this->setAgencia($agencia);
+        $this->setConta($conta);
+        $this->setContaCedente($contacedente);
 
-    function calcular()
-    {
-        $codigo_banco_com_dv = $this->geraCodigoBanco($this->codigobanco);
+        $valor = $this->getValorBoleto();
+        $fatorvencimento = $this->fatorVencimento($this->vencimento);
 
-        $this->vencimento = $this->fator_vencimento($this->vencimento);
-
-        //valor tem 10 digitos, sem virgula
-        $this->valor = $this->formata_numero(number_format($this->valor, 2, ',', ''), 10, 0, "valor");
-        //agencia é 4 digitos
-        $this->agencia = $this->formata_numero($this->agencia, 4, 0);
-        //conta é 6 digitos
-        $this->conta = $this->formata_numero($this->conta, 6, 0);
-        //dv da conta
-        $conta_dv = $this->formata_numero($this->contadigito, 1, 0);
-        //carteira é 2 caracteres
-
-        //nosso número (sem dv) é 11 digitos
-        $nnum = $this->formata_numero($this->carteira, 2, 0) . $this->formata_numero($this->nossonumero, 11, 0);
-        //dv do nosso número
-        $dv_nosso_numero = $this->digitoVerificador_nossonumero($nnum);
-
-        //conta cedente (sem dv) é 7 digitos
-        $this->contacedente = $this->formata_numero($this->contacedente, 7, 0);
-        //dv da conta cedente
-        $this->contacedentedigito = $this->formata_numero($this->contacedentedigito, 1, 0);
-
-        //$ag_contacedente = $agencia . $conta_cedente;
 
         // 43 numeros para o calculo do digito verificador do codigo de barras
-        $dv = $this->digitoVerificador_barra("$this->codigobanco$this->nummoeda$this->vencimento$this->valor$this->agencia$nnum$this->contacedente" . '0', 9, 0);
+        $dv = $this->dvBarra($this->codigobanco.$this->nummoeda.$fatorvencimento.$valor.$this->agencia.$this->nossonumero.$this->contacedente.'0', 9, 0);
         // Numero para o codigo de barras com 44 digitos
-        $linha = "$this->codigobanco$this->nummoeda$dv$this->vencimento$this->valor$this->agencia$nnum$this->contacedente" . "0";
+        $this->codigobarras = $this->codigobanco.$this->nummoeda.$dv.$fatorvencimento.$valor.$this->agencia.$this->nossonumero.$this->contacedente.'0';
 
-        $this->nossonumero = substr($nnum, 0, 2) . '/' . substr($nnum, 2) . '-' . $dv_nosso_numero;
-        $agencia_codigo = $this->agencia . "-" . $this->agenciadigito . " / " . $this->contacedente . "-" . $this->contacedentedigito;
 
-        return array('nossonumero' => $this->nossonumero, 'codigobarras' => $linha, 'linhadigitavel' => $this->monta_linha_digitavel($linha), 'agencia_codigo' => $agencia_codigo, 'codigo_banco_com_dv' => $codigo_banco_com_dv);
+       // $agencia_codigo = $this->agencia . "-" . $this->agenciadigito . " / " . $this->contacedente . "-" . $this->contacedentedigito;
+
     }
 
-    protected function digitoVerificador_nossonumero($numero)
+
+    public function getVencimento()
+    {
+        return $this->vencimento;
+    }
+
+    public function getCarteira()
+    {
+        return $this->carteira;
+    }
+
+    public function getValor()
+    {
+        return $this->valor;
+    }
+
+    public function getNossoNumero()
+    {
+        //dv do nosso número
+        $dv = $this->dvNossonumero($this->nossonumero);
+        return substr($this->nossonumero, 0, 2) . '/' . substr($this->nossonumero, 2) . '-' . $dv;
+    }
+
+    public function getLinhaDigitavel()
+    {
+        return $this->linhaDigitavel($this->codigobarras);
+    }
+
+    public function getCodigoBarras()
+    {
+        return $this->codigobarras;
+    }
+
+    public function setVencimento(\DateTime $date)
+    {
+        $this->vencimento = $date;
+        return $this;
+    }
+
+    public function setValor($valor)
+    {
+        $this->valor = $valor;
+        return $this;
+    }
+
+    public function setNossoNumero($nossonumero, $carteira = null)
+    {
+        if(is_null($carteira)){
+            $carteira = $this->carteira;
+        }
+        //nosso número (sem dv) é 11 digitos
+        $this->nossonumero = $this->formata_numero($carteira, 2, 0) . $this->formata_numero($nossonumero, 11, 0);
+        return $this;
+    }
+
+    public function setCarteira($carteira)
+    {
+        $this->carteira = $carteira;
+        return $this;
+    }
+
+    public function setAgencia($agencia)
+    {
+        //agencia é 4 digitos
+        $this->agencia = $this->formata_numero($agencia, 4, 0);
+        return $this;
+    }
+
+    public function getAgencia()
+    {
+        return  $this->agencia . "-" . $this->agenciadigito . " / " . $this->contacedente . "-" . $this->contacedentedigito;
+    }
+
+    public function setConta($cedente)
+    {
+        //conta é 6 digitos
+        $this->conta = $this->formata_numero($this->conta, 6, 0);
+        return $this;
+    }
+
+    public function getConta()
+    {
+        return $this->conta;
+    }
+
+    public function setContaCedente($contacedente)
+    {
+        //conta cedente (sem dv) é 7 digitos
+        $this->contacedente = $this->formata_numero($contacedente, 7, 0);
+        return $this;
+    }
+
+    public function getContaCedente()
+    {
+        return $this->contacedente;
+    }
+
+    public function setContaCedenteDigito($contacedentedigito)
+    {
+        //dv da conta cedente
+        $this->contacedentedigito = $this->formata_numero($contacedentedigito, 1, 0);
+        return $this;
+    }
+
+    public function getContaCedenteDigito()
+    {
+        return $this->contacedente;
+    }
+
+
+    protected function dvNossonumero($numero)
     {
         $resto2 = $this->modulo_11($numero, 7, 1);
         $digito = 11 - $resto2;
@@ -84,8 +175,23 @@ class Bradesco extends AbstractBank
         return $dv;
     }
 
+    private function getValorBoleto()
+    {
+        return $this->formata_numero(number_format($this->valor, 2, ',', ''),10,0,"valor");
+    }
 
-    protected function monta_linha_digitavel($codigo)
+    protected function dvBarra($numero) {
+        $resto2 = $this->modulo_11($numero, 9, 1);
+        if ($resto2 == 0 || $resto2 == 1 || $resto2 == 10) {
+            $dv = 1;
+        } else {
+            $dv = 11 - $resto2;
+        }
+        return $dv;
+    }
+
+
+    protected function linhaDigitavel($codigo)
     {
         // 01-03    -> Código do banco sem o digito
         // 04-04    -> Código da Moeda (9-Real)
