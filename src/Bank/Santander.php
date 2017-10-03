@@ -11,17 +11,77 @@ namespace Boleto\Bank;
 
 class Santander extends AbstractBank implements InterfaceBank
 {
-    public $vencimento = '';
-    public $valor = '';
-    public $agencia = '';
-    public $conta = '';
-    public $nossonumero = '';
-    public $digito_nossonumero = '';
-    public $codigobanco = '033';
-    public $carteira = '101';
-    public $nummoeda = "9";
-    public $fixo = "9";
-    public $ios = "0";
+    private $vencimento;
+    private $valor;
+    private $agencia;
+    private $conta;
+    private $nossonumero;
+    private $codigobarras;
+    private $codigobanco = '033';
+    private $carteira = '101';
+    private $nummoeda = "9";
+    private $fixo = "9";
+    private $ios = "0";
+
+
+    function __construct(\DateTime $vencimento = null, $valor = null, $nossonumero, $carteira, $agencia, $conta)
+    {
+        $this->setVencimento($vencimento);
+        $this->setValor($valor);
+        $this->setNossoNumero($nossonumero);
+        $this->setCarteira($carteira);
+        $this->setAgencia($agencia);
+        $this->setConta($conta);
+        $valor = $this->getValorBoleto();
+        $fatorvencimento = $this->fatorVencimento($this->vencimento);
+
+
+        $dv = $this->codigobanco . $this->nummoeda . $fatorvencimento . $valor . $this->fixo . $this->conta . $this->nossonumero . $this->ios . $this->carteira;
+        $this->codigobarras = $this->codigobanco . $this->nummoeda . $this->dvBarra($dv) . $fatorvencimento . $valor . $this->fixo . $this->conta . $this->nossonumero . $this->ios . $this->carteira;
+
+    }
+
+    function calcular()
+    {
+        $codigo_banco_com_dv = $this->geraCodigoBanco($this->codigobanco);
+
+
+        //echo $linha = "BANCO[$this->codigobanco]MOEDA[$this->nummoeda]FATOR VENCIMENTO[$this->vencimento]VALOR[$this->valor]FIXO[$this->fixo]CODIGO CLIENTE[$this->conta]NOSSO NUMERO[$this->nossonumero]IOS[$this->ios]CARTEIRA[$this->carteira]<br><br>";
+
+       // $agencia_codigo = $this->agencia . "/" . $this->conta . "/" . $this->dvBarra($linha);
+        //
+        //return array('nossonumero' => $this->nossonumero, 'codigobarras' => $barra, 'linhadigitavel' => $this->monta_linha_digitavel(substr($linha, 0, 4) . $this->dvBarra($linha) . substr($linha, 4)), 'agencia_codigo' => $agencia_codigo, 'codigo_banco_com_dv' => $codigo_banco_com_dv);
+    }
+
+    public function getVencimento()
+    {
+        return $this->vencimento;
+    }
+
+    public function getCarteira()
+    {
+        // TODO: Implement getCarteira() method.
+    }
+
+    public function getValor()
+    {
+        return $this->valor;
+    }
+
+    public function getNossoNumero()
+    {
+        return $this->nossonumero;
+    }
+
+    public function getLinhaDigitavel()
+    {
+        return $this->linhaDigitavel($this->codigobarras);
+    }
+
+    public function getCodigoBarras()
+    {
+        return $this->codigobarras;
+    }
 
     public function setVencimento(\DateTime $date)
     {
@@ -35,50 +95,46 @@ class Santander extends AbstractBank implements InterfaceBank
 
     public function setNossoNumero($nossonumero)
     {
-        $this->nossonumero = substr($nossonumero, -7);
-    }
-
-
-    function __construct()
-    {
-
-    }
-
-    function calcular()
-    {
-        $codigo_banco_com_dv = $this->geraCodigoBanco($this->codigobanco);
-
-        $this->vencimento = $this->fator_vencimento($this->vencimento);
-
-        //valor tem 10 digitos, sem virgula
-        $this->valor = $this->formata_numero(number_format($this->valor, 2, ',', ''), 10, 0, "valor");
-        //agencia é 4 digitos
-        $this->agencia = $this->formata_numero($this->agencia, 4, 0);
-        //conta é 7 digitos
-        $this->conta = $this->formata_numero($this->conta, 7, 0);
-
-
         //nosso número (sem dv) é 11 digitos
-        $this->digito_nossonumero = $this->formata_numero($this->nossonumero, 7, 0);
+        $digito = $this->formata_numero($nossonumero, 7, 0);
         //dv do nosso número
-        $this->digito_nossonumero = $this->modulo_11($this->digito_nossonumero, 9, 0);
-
+        $digito = $this->modulo_11($digito, 9, 0);
         //nosso número com maximo de 13 digitos
-        $this->nossonumero = $this->formata_numero($this->nossonumero . $this->digito_nossonumero, 13, 0);
+        $this->nossonumero = $this->formata_numero($nossonumero . $digito, 13, 0);
+    }
 
-        $linha = "$this->codigobanco$this->nummoeda$this->vencimento$this->valor$this->fixo$this->conta$this->nossonumero$this->ios$this->carteira";
-        $barra = "$this->codigobanco$this->nummoeda" . $this->dvBarra($linha) . "$this->vencimento$this->valor$this->fixo$this->conta$this->nossonumero$this->ios$this->carteira";
+    public function setCarteira($carteira)
+    {
+        $this->carteira = $carteira;
+        return $this;
+    }
 
-        //echo $linha = "BANCO[$this->codigobanco]MOEDA[$this->nummoeda]FATOR VENCIMENTO[$this->vencimento]VALOR[$this->valor]FIXO[$this->fixo]CODIGO CLIENTE[$this->conta]NOSSO NUMERO[$this->nossonumero]IOS[$this->ios]CARTEIRA[$this->carteira]<br><br>";
+    public function setAgencia($agencia)
+    {
+        //agencia é 4 digitos
+        $this->formata_numero($agencia, 4, 0);
+        return $this;
+    }
 
-        $agencia_codigo = $this->agencia . "/" . $this->conta . "/" . $this->dvBarra($linha);
-        //
-        return array('nossonumero' => $this->nossonumero, 'codigobarras' => $barra, 'linhadigitavel' => $this->monta_linha_digitavel(substr($linha, 0, 4) . $this->dvBarra($linha) . substr($linha, 4)), 'agencia_codigo' => $agencia_codigo, 'codigo_banco_com_dv' => $codigo_banco_com_dv);
+    public function getAgencia()
+    {
+        return $this->agencia;
+    }
 
+    public function setConta($conta)
+    {
+        //conta é 7 digitos
+        $this->conta = $this->formata_numero($conta, 7, 0);
+        return $this;
+    }
+
+    private function getValorBoleto()
+    {
+        return $this->formata_numero(number_format($this->valor, 2, ',', ''),10,0,"valor");
     }
 
     //CORRIGIDO
-    protected function monta_linha_digitavel($codigo)
+    protected function linhaDigitavel($codigo)
     {
         // Posição 	Conteúdo
         // 1 a 3    Número do banco

@@ -14,15 +14,15 @@ class Bradesco extends AbstractBank implements InterfaceBank
     /**
      * @var \DateTime
      */
-    private $vencimento = '';
-    private $valor = '';
-    private $agencia = '';
-    private $agenciadigito = '';
-    private $conta = '';
-    private $contadigito = '';
-    private $contacedente = '';
-    private $contacedentedigito = '';
-    private $nossonumero = '';
+    private $vencimento;
+    private $valor;
+    private $agencia;
+    private $agenciadigito;
+    private $conta;
+    private $contadigito;
+    private $contacedente;
+    private $contacedentedigito;
+    private $nossonumero;
     private $codigobanco = '237';
     private $carteira = '09';
     private $nummoeda = "9";

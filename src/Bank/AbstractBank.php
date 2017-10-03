@@ -156,8 +156,11 @@ class AbstractBank
         } else return '';
     }
 
-    public function printBarras($codigo, $altura, $espmin, $file)
+    public function getCodigoBarrasBase64($codigo = null, $altura = 50, $espmin = 1.7)
     {
+        if (is_null($codigo)) {
+            $codigo = $this->getCodigoBarras();
+        }
         $mapaI25 = $this->codificar($codigo);
         if (!extension_loaded('gd')) {
             //dl('php_gd2.dll');
@@ -187,12 +190,22 @@ class AbstractBank
                 $spH = $spH + $espmin + 3;
             }
         }
-        imagepng($im, $file);
+
+        ob_start();
+        imagepng($im);
+        $buffer = ob_get_clean();
+        ob_end_clean();
         imagedestroy($im);
+        return base64_encode($buffer);
     }
 
-    public function printLinhaDigitavel($codigo, $altura, $largura, $fontsize, $font, $file)
+    public function getLinhaDigitavelBase64($codigo = null, $altura = 35, $largura = 450, $fontsize = 11, $font = 'arialbd.ttf')
     {
+        if (is_null($codigo)) {
+            $codigo = $this->getLinhaDigitavel();
+        }
+
+        $font = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Font' . DIRECTORY_SEPARATOR . $font;
 
         $im = imagecreate($largura, $altura);
         imagecolorallocate($im, 255, 255, 255);
@@ -205,8 +218,12 @@ class AbstractBank
         $y = ((imagesy($im) / 2) - ($textHeight / 2)) + abs($dimensions[7]);
 
         imagettftext($im, $fontsize, 0, $x, $y, $black, $font, $codigo);
-        imagepng($im, $file);
+        ob_start();
+        imagepng($im);
+        $buffer = ob_get_clean();
+        ob_end_clean();
         imagedestroy($im);
+        return base64_encode($buffer);
 
     }
 

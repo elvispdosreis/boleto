@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="iso-8859-1">
-    <title>Pedido N&deg; <?php echo $varBoleto['id_venda']; ?></title>
+    <title>Pedido N&deg; {$boleto.nossonumero}</title>
     <style>
         table, ul {
             margin: 0 auto;
@@ -123,7 +123,7 @@
         <td colspan="2" class="logo"><img src="imgs/<?php echo $varBoleto['codigo_banco_com_dv']; ?>.jpg" border="0">
         </td>
         <td colspan="2" class="banco"><?php echo $varBoleto['codigo_banco_com_dv']; ?></td>
-        <td colspan="14" class="linha"><img src="tmp/<?php echo $varBoleto[" linhadigitavel"]; ?>.png"></td>
+        <td colspan="14" class="linha"><img src="data:image/jpeg;base64,{$boleto.getLinhaDigitavelBase64()}"></td>
     </tr>
     <tr class="title">
         <td colspan="9">Cedente</td>
@@ -133,7 +133,7 @@
         <td>Nosso n&uacute;mero</td>
     </tr>
     <tr class="value">
-        <td colspan="9"><?php echo $varBoleto['cedente_nome']; ?></td>
+        <td colspan="9">{$boleto.cedente.nome}</td>
         <td colspan="5" class="text-right"><?php echo $varBoleto['agencia_codigo']; ?></td>
         <td colspan="2" class="text-right">R$</td>
         <td>&nbsp;</td>
@@ -178,9 +178,9 @@
     </tr>
     <tr class="value">
         <td colspan="18" height="180" style="vertical-align:top; border-bottom:none;">
-            <?php echo $varBoleto['demostrativo1']; ?><br>
-            <?php echo $varBoleto['demostrativo2']; ?><br>
-            <?php echo $varBoleto['demostrativo3']; ?>
+            {$boleto.demostrativo1}<br>
+            {$boleto.demostrativo2}<br>
+            {$boleto.demostrativo3}
         </td>
     </tr>
     <tr class="title">
@@ -193,7 +193,7 @@
         <td colspan="2" class="logo"><img src="imgs/<?php echo $varBoleto['codigo_banco_com_dv']; ?>.jpg" border="0">
         </td>
         <td colspan="2" class="banco"><?php echo $varBoleto['codigo_banco_com_dv']; ?></td>
-        <td colspan="14" class="linha"><img src="tmp/<?php echo $varBoleto[" linhadigitavel"]; ?>.png"></td>
+        <td colspan="14" class="linha"><img src="data:image/jpeg;base64,{$boleto.getLinhaDigitavelBase64()}"></td>
     </tr>
     <tr class="title">
         <td colspan="17">Local de Pagamento</td>
@@ -201,7 +201,7 @@
     </tr>
     <tr class="value">
         <td colspan="17">Pag&aacute;vel em qualquer Banco at&eacute; o vencimento</td>
-        <td class="text-right"><?php echo $varBoleto['vencimento']; ?></td>
+        <td class="text-right">{$boleto.vencimento}</td>
     </tr>
     <tr class="title">
         <td colspan="17">Cedente</td>
@@ -249,10 +249,7 @@
     </tr>
     <tr class="value">
         <td colspan="17" rowspan="9" style="vertical-align:top">
-            <?php echo $varBoleto['instrucoes1']; ?><br>
-            <?php echo $varBoleto['instrucoes2']; ?><br>
-            <?php echo $varBoleto['instrucoes3']; ?><br>
-            <?php echo $varBoleto['instrucoes4']; ?>
+            {$boleto.instrucoes1}<br>{$boleto.instrucoes2}<br>{$boleto.instrucoes3}<br>{$boleto.instrucoes4}
         </td>
         <td>&nbsp;</td>
     </tr>
@@ -285,11 +282,11 @@
         <td>&nbsp;</td>
     </tr>
     <tr class="value sacado">
-        <td colspan="17">
-            <?php echo $varBoleto['sacado_nome'].' - '.$varBoleto['sacado_cpfcnpj']; ?><br>
-            <?php echo $varBoleto['sacado_endereco'].", ".$varBoleto['sacado_numero']."  ".$varBoleto['sacado_complemento']; ?>
+        <td colspan="17">{$boleto.sacado.nome} - {$boleto.sacado.cpf}<br>
+            {$boleto.sacado.endereco}, {$boleto.sacado.numero} {$boleto.sacado.complemento}
             <br>
-            <?php echo $varBoleto['sacado_bairro']." - ".$varBoleto['sacado_cidade']." - ".$varBoleto['sacado_estado']." / Cep:".$varBoleto['sacado_cep']." - ".$varBoleto['sacado_pais']; ?>
+            {$boleto.sacado.bairro} - {$boleto.sacado.cidade} - {$boleto.sacado.estado} / Cep: {$boleto.sacado.cep}
+            - {$boleto.sacado.pais}
         </td>
         <td>&nbsp;</td>
     </tr>
@@ -299,7 +296,7 @@
         </td>
     </tr>
     <tr class="value barcode">
-        <td colspan="18"><img src="tmp/<?php echo $varBoleto['codigobarras']; ?>.png"></td>
+        <td colspan="18"><img src="data:image/jpeg;base64,{$boleto.getCodigoBarrasBase64()}"></td>
     </tr>
 </table>
 </body>
