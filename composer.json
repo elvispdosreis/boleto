@@ -1,20 +1,26 @@
 {
-    "name": "reis/boleto",
-    "description": "Boleto Bancario, em desenvolvimento ... ",
-    "type": "library",
-    "require": {
-        "php": ">=5.6",
-        "psr/log": "^1.0"
-    },
-    "authors": [
-        {
-            "name": "Elvis P. dos Reis",
-            "email": "elvisdosreis@gmail.com"
-        }
-    ],
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "autoload": {
-        "psr-4": {"Boleto\\": "src"}
+  "name": "reis/boleto",
+  "description": "Boleto Bancario, em desenvolvimento ... ",
+  "type": "library",
+  "require": {
+    "php": ">=5.6",
+    "ext-apcu": "*",
+    "psr/log": "^1.0",
+    "guzzlehttp/guzzle": "^6.3",
+    "meng-tian/async-soap-guzzle": "^0.2.4",
+    "cache/apcu-adapter": "^1.0"
+  },
+  "authors": [
+    {
+      "name": "Elvis P. dos Reis",
+      "email": "elvisdosreis@gmail.com"
     }
+  ],
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "autoload": {
+    "psr-4": {
+      "Boleto\\": "src"
+    }
+  }
 }
