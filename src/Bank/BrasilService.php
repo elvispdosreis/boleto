@@ -23,7 +23,7 @@ class BrasilService implements InterfaceBank
     /**
      * @var \DateTime
      */
-    private $vencimento;
+    private $vencimento, $emissao;
     private $valor;
     private $convenio;
     private $variacaocarteira;
@@ -55,6 +55,7 @@ class BrasilService implements InterfaceBank
     {
         $this->cache = new ApcuCachePool();
 
+        $this->emissao = new \DateTime();
         $this->vencimento = $vencimento;
         $this->valor = $valor;
         $this->nossonumero = $nossonumero;
@@ -64,6 +65,16 @@ class BrasilService implements InterfaceBank
         $this->pagador = $pagador;
         $this->clientId = $clientId;
         $this->secretId = $secredId;
+    }
+
+    /**
+     * @param \DateTime $date
+     * @return BrasilService
+     */
+    public function setEmissao(\DateTime $date)
+    {
+        $this->emissao = $date;
+        return $this;
     }
 
     /**
@@ -194,6 +205,20 @@ class BrasilService implements InterfaceBank
         $this->linhadigitavel = $linhadigitavel;
     }
 
+    /**
+     * @param \DateTime
+     */
+    public function getEmissao()
+    {
+        if (is_null($this->emissao)) {
+            throw new \InvalidArgumentException('Data Emissäo inválido.');
+        }
+        return $this->vencimento;
+    }
+
+    /**
+     * @param \DateTime
+     */
     public function getVencimento()
     {
         if (is_null($this->vencimento)) {
@@ -312,7 +337,7 @@ class BrasilService implements InterfaceBank
             $titulo->addChild('numeroVariacaoCarteira', $this->getVariacaCarteira());
 
             $titulo->addChild('codigoModalidadeTitulo', 1);
-            $titulo->addChild('dataEmissaoTitulo', $this->getVencimento()->format('d.m.Y'));
+            $titulo->addChild('dataEmissaoTitulo', $this->getEmissao()->format('d.m.Y'));
             $titulo->addChild('dataVencimentoTitulo', $this->getVencimento()->format('d.m.Y'));
             $titulo->addChild('valorOriginalTitulo', $this->getValor());
             $titulo->addChild('codigoTipoDesconto', '');
