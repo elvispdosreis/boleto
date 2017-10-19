@@ -1,0 +1,536 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Created by TIBCO WSDL-->
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://xmlns.example.com/1466775928160" xmlns:ns0="http://www.tibco.com/schemas/bws_registro_cbr/Recursos/XSD/Schema.xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" name="Untitled" targetNamespace="http://xmlns.example.com/1466775928160">
+    <wsdl:types>
+        <xs:schema xmlns="http://www.tibco.com/schemas/bws_registro_cbr/Recursos/XSD/Schema.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.tibco.com/schemas/bws_registro_cbr/Recursos/XSD/Schema.xsd" elementFormDefault="qualified" attributeFormDefault="unqualified">
+            <xs:element name="erro">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="Mensagem" type="xs:string" minOccurs="0"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="requisicao">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="numeroConvenio" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:int">
+                                    <xs:totalDigits value="9"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="numeroCarteira" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:short">
+                                    <xs:totalDigits value="4"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="numeroVariacaoCarteira" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:short">
+                                    <xs:totalDigits value="4"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="codigoModalidadeTitulo" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:short">
+                                    <xs:totalDigits value="4"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="dataEmissaoTitulo" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="10"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="dataVencimentoTitulo" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="10"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="valorOriginalTitulo" default="0.0" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:decimal">
+                                    <xs:totalDigits value="17"/>
+                                    <xs:fractionDigits value="2"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="codigoTipoDesconto" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:short">
+                                    <xs:totalDigits value="1"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="dataDescontoTitulo" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="10"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="percentualDescontoTitulo" default="0.0" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:decimal">
+                                    <xs:totalDigits value="5"/>
+                                    <xs:fractionDigits value="2"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="valorDescontoTitulo" default="0.0" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:decimal">
+                                    <xs:totalDigits value="17"/>
+                                    <xs:fractionDigits value="2"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="valorAbatimentoTitulo" default="0.0" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:decimal">
+                                    <xs:totalDigits value="17"/>
+                                    <xs:fractionDigits value="2"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="quantidadeDiaProtesto" default="0" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:short">
+                                    <xs:totalDigits value="4"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="codigoTipoJuroMora" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:short">
+                                    <xs:totalDigits value="1"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="percentualJuroMoraTitulo" default="0.0" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:decimal">
+                                    <xs:totalDigits value="5"/>
+                                    <xs:fractionDigits value="2"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="valorJuroMoraTitulo" default="0.0" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:decimal">
+                                    <xs:totalDigits value="17"/>
+                                    <xs:fractionDigits value="2"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="codigoTipoMulta" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:short">
+                                    <xs:totalDigits value="1"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="dataMultaTitulo" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="10"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="percentualMultaTitulo" default="0.0" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:decimal">
+                                    <xs:totalDigits value="5"/>
+                                    <xs:fractionDigits value="2"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="valorMultaTitulo" default="0.0" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:decimal">
+                                    <xs:totalDigits value="17"/>
+                                    <xs:fractionDigits value="2"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="codigoAceiteTitulo" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="1"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="codigoTipoTitulo" default="0" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:short">
+                                    <xs:totalDigits value="4"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="textoDescricaoTipoTitulo" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="30"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="indicadorPermissaoRecebimentoParcial" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="1"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="textoNumeroTituloBeneficiario" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="15"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="textoCampoUtilizacaoBeneficiario" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="25"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="codigoTipoContaCaucao" default="0" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:short">
+                                    <xs:totalDigits value="1"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="textoNumeroTituloCliente" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="20"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="textoMensagemBloquetoOcorrencia" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="220"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="codigoTipoInscricaoPagador" default="0" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:short">
+                                    <xs:totalDigits value="1"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="numeroInscricaoPagador" default="0" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:totalDigits value="15"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="nomePagador" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="60"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="textoEnderecoPagador" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="60"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="numeroCepPagador" default="0" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:int">
+                                    <xs:totalDigits value="8"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="nomeMunicipioPagador" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="20"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="nomeBairroPagador" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="20"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="siglaUfPagador" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="2"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="textoNumeroTelefonePagador" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="12"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="codigoTipoInscricaoAvalista" default="0" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:short">
+                                    <xs:totalDigits value="1"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="numeroInscricaoAvalista" default="0" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:totalDigits value="15"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="nomeAvalistaTitulo" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="60"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="codigoChaveUsuario" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="8"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="codigoTipoCanalSolicitacao" default="5" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:short">
+                                    <xs:totalDigits value="1"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="resposta">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="siglaSistemaMensagem" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="3"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="codigoRetornoPrograma" type="xs:short" minOccurs="0"/>
+                        <xs:element name="nomeProgramaErro" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="8"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="textoMensagemErro" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="68"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="numeroPosicaoErroPrograma" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:short">
+                                    <xs:totalDigits value="4"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="codigoTipoRetornoPrograma" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:short">
+                                    <xs:totalDigits value="1"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="textoNumeroTituloCobrancaBb" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="20"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="numeroCarteiraCobranca" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:short">
+                                    <xs:totalDigits value="4"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="numeroVariacaoCarteiraCobranca" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:short">
+                                    <xs:totalDigits value="4"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="codigoPrefixoDependenciaBeneficiario" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:short">
+                                    <xs:totalDigits value="4"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="numeroContaCorrenteBeneficiario" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:int">
+                                    <xs:totalDigits value="9"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="codigoCliente" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:int">
+                                    <xs:totalDigits value="9"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="linhaDigitavel" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="47"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="codigoBarraNumerico" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="52"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="codigoTipoEnderecoBeneficiario" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:short">
+                                    <xs:totalDigits value="1"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="nomeLogradouroBeneficiario" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="60"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="nomeBairroBeneficiario" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="30"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="nomeMunicipioBeneficiario" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="30"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="codigoMunicipioBeneficiario" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:int">
+                                    <xs:totalDigits value="9"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="siglaUfBeneficiario" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="2"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="codigoCepBeneficiario" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:int">
+                                    <xs:totalDigits value="9"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="indicadorComprovacaoBeneficiario" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="1"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="numeroContratoCobranca" minOccurs="0">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:int">
+                                    <xs:totalDigits value="9"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="root">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element ref="ns0:requisicao"/>
+                        <xs:element ref="ns0:resposta"/>
+                        <xs:element ref="ns0:erro"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:service name="RegistroCobrancaService.serviceagent">
+        <wsdl:port name="RegistroCobrancaEndpoint" binding="tns:RegistroCobrancaEndpointBinding">
+            <soap:address location="https://cobranca.homologa.bb.com.br:7101/registrarBoleto"/>
+        </wsdl:port>
+    </wsdl:service>
+    <wsdl:portType name="portType">
+        <wsdl:operation name="RegistroTituloCobranca">
+            <wsdl:input message="tns:requisicao"/>
+            <wsdl:output message="tns:resposta"/>
+            <wsdl:fault name="fault1" message="tns:erro"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="RegistroCobrancaEndpointBinding" type="tns:portType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="RegistroTituloCobranca">
+            <soap:operation style="document" soapAction="registrarBoleto"/>
+            <wsdl:input>
+                <soap:body use="literal" parts="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" parts="parameters"/>
+            </wsdl:output>
+            <wsdl:fault name="fault1">
+                <soap:fault use="literal" name="fault1"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:message name="requisicao">
+        <wsdl:part name="parameters" element="ns0:requisicao"/>
+    </wsdl:message>
+    <wsdl:message name="resposta">
+        <wsdl:part name="parameters" element="ns0:resposta"/>
+    </wsdl:message>
+    <wsdl:message name="erro">
+        <wsdl:part name="parameters" element="ns0:erro"/>
+    </wsdl:message>
+</wsdl:definitions>

@@ -10,6 +10,7 @@ namespace Boleto\Bank;
 
 
 use Boleto\Entity\Pagador;
+use Boleto\Exception\InvalidArgumentException;
 use Cache\Adapter\Apcu\ApcuCachePool;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -369,7 +370,7 @@ class BrasilService implements InterfaceBank
             $result = $client->__soapCall("RegistroTituloCobranca", [$titulo]);
 
             if ($result->codigoRetornoPrograma !== 0) {
-                throw new \Exception(trim($result->textoMensagemErro));
+                throw new InvalidArgumentException($result->nomeProgramaErro, trim($result->textoMensagemErro));
             }
 
             $this->setCodigobarras($result->codigoBarraNumerico);
@@ -378,7 +379,7 @@ class BrasilService implements InterfaceBank
         } catch (\SoapFault $sf) {
             throw new \Exception($sf->faultstring, 500);
         } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
+            throw new \Exception($e->getMessage(), 500, $e);
         }
 
     }
