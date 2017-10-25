@@ -1,0 +1,5 @@
+{
+    "require": {
+        "meng-tian/async-soap-guzzle": "^0.2.4"
+    }
+}
