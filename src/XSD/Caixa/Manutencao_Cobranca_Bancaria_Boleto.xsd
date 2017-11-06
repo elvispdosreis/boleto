@@ -1,0 +1,497 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://caixa.gov.br/sibar/manutencao_cobranca_bancaria/boleto" 
+			xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+			xmlns:sibar_base="http://caixa.gov.br/sibar" 
+			xmlns:manutencaocobrancabancaria="http://caixa.gov.br/sibar/manutencao_cobranca_bancaria/boleto" xmlns:Q1="http://caixa.gov.br/sibar/manutencao_cobranca_bancaria/boleto/externo">
+
+    <xsd:import schemaLocation="Manutencao_Cobranca_Bancaria_Boleto_Externo.xsd" namespace="http://caixa.gov.br/sibar/manutencao_cobranca_bancaria/boleto/externo"></xsd:import>
+    <xsd:import schemaLocation="Inclui_Boleto.xsd" namespace="http://caixa.gov.br/sibar/manutencao_cobranca_bancaria/boleto/externo"></xsd:import>
+    <xsd:import schemaLocation="Emite_Boleto.xsd" namespace="http://caixa.gov.br/sibar/manutencao_cobranca_bancaria/boleto/externo"></xsd:import>
+    <xsd:import schemaLocation="../BAR_MSG_BARRAMENTO_LIB/MensagensBarramento.xsd"
+		namespace="http://caixa.gov.br/sibar"/>
+
+    <xsd:element name="SERVICO_ENTRADA"
+        type="manutencaocobrancabancaria:SERVICO_ENTRADA_NEGOCIAL_TYPE"/>
+
+    <xsd:complexType name="SERVICO_ENTRADA_NEGOCIAL_TYPE">
+        <xsd:complexContent>
+            <xsd:extension base="sibar_base:SERVICO_ENTRADA_TYPE">
+                <xsd:sequence>
+                    <xsd:element name="DADOS" type="manutencaocobrancabancaria:DADOS_ENTRADA_TYPE"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="DADOS_ENTRADA_TYPE">
+        <xsd:sequence>
+        	<xsd:choice>
+        		<xsd:element name="INCLUI_SOLICITACAO_PRE_IMPRESSO"
+        			type="manutencaocobrancabancaria:INCLUI_SOLICITACAO_PRE_IMPRESSO_TYPE" />
+        		<xsd:element name="ALTERA_SOLICITACAO_PRE_IMPRESSO"
+        			type="manutencaocobrancabancaria:ALTERA_SOLICITACAO_PRE_IMPRESSO_TYPE" />
+        		<xsd:element name="EXCLUI_SOLICITACAO_PRE_IMPRESSO"
+        			type="manutencaocobrancabancaria:EXCLUI_SOLICITACAO_PRE_IMPRESSO_TYPE" />
+        		<xsd:element name="INCLUI_SOLICITACAO_GRUPO_PAGADOR"
+        			type="manutencaocobrancabancaria:INCLUI_ALTERA_SOLICITACAO_GRUPO_PAGADOR_TYPE" />
+        		<xsd:element name="ALTERA_SOLICITACAO_GRUPO_PAGADOR"
+        			type="manutencaocobrancabancaria:INCLUI_ALTERA_SOLICITACAO_GRUPO_PAGADOR_TYPE" />
+        		<xsd:element name="EXCLUI_SOLICITACAO_GRUPO_PAGADOR"
+        			type="manutencaocobrancabancaria:EXCLUI_SOLICITACAO_GRUPO_PAGADOR_TYPE" />
+        		<xsd:element name="INCLUI_BOLETO"
+        			type="manutencaocobrancabancaria:INCLUI_BOLETO_ENTRADA_TYPE">
+        		</xsd:element>
+        		<xsd:element name="ALTERA_BOLETO"
+        			type="manutencaocobrancabancaria:ALTERA_BOLETO_ENTRADA_TYPE">
+        		</xsd:element>
+        		<xsd:element name="BAIXA_BOLETO" type="manutencaocobrancabancaria:BAIXA_BOLETO_ENTRADA_TYPE"></xsd:element>
+        	</xsd:choice>
+        	
+        </xsd:sequence>
+    </xsd:complexType>
+
+	<xsd:element name="SERVICO_SAIDA" 
+		type="manutencaocobrancabancaria:SERVICO_SAIDA_NEGOCIAL_TYPE"/>
+
+	<xsd:complexType name="SERVICO_SAIDA_NEGOCIAL_TYPE">
+		<xsd:complexContent>
+			<xsd:extension base="sibar_base:SERVICO_SAIDA_TYPE">
+				<xsd:sequence>
+					<xsd:element name="DADOS" type="manutencaocobrancabancaria:DADOS_SAIDA_TYPE" minOccurs="0" maxOccurs="1"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="DADOS_SAIDA_TYPE">
+		<xsd:complexContent>
+			<xsd:extension base="sibar_base:DADOS_SAIDA_TYPE">
+                <xsd:choice>
+                	<xsd:element name="COMPROVANTE"
+                		type="manutencaocobrancabancaria:COMPROVANTE_TYPE"
+                		minOccurs="0" />
+                	<xsd:element name="INCLUI_BOLETO"
+                		type="manutencaocobrancabancaria:INCLUI_BOLETO_SAIDA_TYPE"
+                		minOccurs="0" maxOccurs="1">
+                	</xsd:element>
+                	<xsd:element name="ALTERA_BOLETO" type="manutencaocobrancabancaria:ALTERA_BOLETO_SAIDA_TYPE" minOccurs="0" maxOccurs="1"></xsd:element>
+                </xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+
+<!-- INCLUSAO DE SOLICITACAO DE PRE-IMPRESSOS -->
+
+	<xsd:complexType name="INCLUI_SOLICITACAO_PRE_IMPRESSO_TYPE">
+		<xsd:sequence>
+			<xsd:element name="CODIGO_BENEFICIARIO">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="0"></xsd:minInclusive>
+						<xsd:maxInclusive value="999999"></xsd:maxInclusive>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="NOSSO_NUMERO" minOccurs="0" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:long">
+						<xsd:minInclusive value="0"></xsd:minInclusive>
+						<xsd:maxInclusive value="999999999999999"></xsd:maxInclusive>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="TIPO_ENTREGA">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:short">
+						<xsd:minInclusive value="0"></xsd:minInclusive>
+						<xsd:maxInclusive value="999"></xsd:maxInclusive>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="QUANTIDADE_BLOQUETO">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="0"></xsd:minInclusive>
+						<xsd:maxInclusive value="999999999"></xsd:maxInclusive>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="TIPO_BLOQUETO">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:short">
+						<xsd:minInclusive value="0"></xsd:minInclusive>
+						<xsd:maxInclusive value="9"></xsd:maxInclusive>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="TIPO_COBRANCA">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="1"></xsd:maxLength>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+
+<!-- ALTERACAO DE SOLICITACAO DE PRE-IMPRESSOS -->
+
+	<xsd:complexType name="ALTERA_SOLICITACAO_PRE_IMPRESSO_TYPE">
+		<xsd:sequence>
+			<xsd:element name="CODIGO_BENEFICIARIO">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="0"></xsd:minInclusive>
+						<xsd:maxInclusive value="999999"></xsd:maxInclusive>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="NOSSO_NUMERO" minOccurs="1" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:long">
+						<xsd:minInclusive value="0"></xsd:minInclusive>
+						<xsd:maxInclusive value="999999999999999999"></xsd:maxInclusive>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="TIPO_ENTREGA">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:short">
+						<xsd:minInclusive value="0"></xsd:minInclusive>
+						<xsd:maxInclusive value="999"></xsd:maxInclusive>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="QUANTIDADE_BLOQUETO">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="0"></xsd:minInclusive>
+						<xsd:maxInclusive value="999999999"></xsd:maxInclusive>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="TIPO_BLOQUETO">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:short">
+						<xsd:minInclusive value="0"></xsd:minInclusive>
+						<xsd:maxInclusive value="9"></xsd:maxInclusive>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="TIPO_COBRANCA">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="1"></xsd:maxLength>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	
+<!-- EXCLUSAO DE SOLICITACAO DE PRE-IMPRESSOS -->
+
+	<xsd:complexType name="EXCLUI_SOLICITACAO_PRE_IMPRESSO_TYPE">
+		<xsd:sequence>
+			<xsd:element name="CODIGO_BENEFICIARIO">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="0"></xsd:minInclusive>
+						<xsd:maxInclusive value="999999"></xsd:maxInclusive>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="DATA_SOLICITACAO" type="xsd:date"></xsd:element>
+			<xsd:element name="TIPO_BLOQUETO">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="1"></xsd:maxLength>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+
+<!-- INCLUSAO/ALTERACAO DE SOLICITACAO DE GRUPO DE PAGADORES -->
+
+	<xsd:complexType name="INCLUI_ALTERA_SOLICITACAO_GRUPO_PAGADOR_TYPE">
+		<xsd:sequence>
+			<xsd:element name="CODIGO_BENEFICIARIO">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="0"></xsd:minInclusive>
+						<xsd:maxInclusive value="999999"></xsd:maxInclusive>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="CODIGO_GRUPO">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:short">
+						<xsd:minInclusive value="0"></xsd:minInclusive>
+						<xsd:maxInclusive value="999"></xsd:maxInclusive>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="DATA_SOLICITACAO" type="xsd:date"></xsd:element>
+			<xsd:element name="TIPO_REGISTRO">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:short">
+						<xsd:enumeration value="1"></xsd:enumeration>
+						<xsd:enumeration value="2"></xsd:enumeration>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="CODIGO_OBTER_ENVIO">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:short">
+						<xsd:enumeration value="1"></xsd:enumeration>
+						<xsd:enumeration value="2"></xsd:enumeration>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="TIPO_ENVIO">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:short">
+						<xsd:minInclusive value="0"></xsd:minInclusive>
+						<xsd:maxInclusive value="99"></xsd:maxInclusive>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="DATA_VENCIMENTO" type="xsd:date"></xsd:element>
+			<xsd:element name="CODIGO_OBTER_VALOR">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:short">
+						<xsd:enumeration value="1"></xsd:enumeration>
+						<xsd:enumeration value="2"></xsd:enumeration>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="VALOR_TITULO">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:minInclusive value="0"></xsd:minInclusive>
+						<xsd:maxInclusive value="9999999999999.99"></xsd:maxInclusive>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="INDICADOR_PROTESTO">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="1"></xsd:maxLength>
+						<xsd:enumeration value="S"></xsd:enumeration>
+						<xsd:enumeration value="N"></xsd:enumeration>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="PRAZO_PROTESTO_DEVOLUCAO">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:short">
+						<xsd:minInclusive value="0"></xsd:minInclusive>
+						<xsd:maxInclusive value="9999"></xsd:maxInclusive>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="CODIGO_ESPECIE">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:short">
+						<xsd:minInclusive value="0"></xsd:minInclusive>
+						<xsd:maxInclusive value="999"></xsd:maxInclusive>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="CODIGO_ACEITE">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="1"></xsd:maxLength>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="CODIGO_ENDOSSO">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="1"></xsd:enumeration>
+						<xsd:enumeration value="2"></xsd:enumeration>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="COMPLEMENTARES" type="manutencaocobrancabancaria:COMPLEMENTARES_TYPE" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="COMPLEMENTARES_TYPE">
+		<xsd:sequence>
+			<xsd:element name="DESCONTOS" type="manutencaocobrancabancaria:DESCONTOS_TYPE" minOccurs="0" />
+			<xsd:element name="MULTA" type="manutencaocobrancabancaria:DESCONTO_MULTA_TYPE" minOccurs="0" />
+			<xsd:element name="JUROS" type="manutencaocobrancabancaria:JUROS_TYPE" minOccurs="0" />
+			<xsd:element name="IMPOSTOS" type="manutencaocobrancabancaria:IMPOSTOS_TYPE" minOccurs="0" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="DESCONTOS_TYPE">
+		<xsd:sequence>
+			<xsd:element name="DESCONTO" type="manutencaocobrancabancaria:DESCONTO_MULTA_TYPE" maxOccurs="3"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="DESCONTO_MULTA_TYPE">
+		<xsd:sequence>
+			<xsd:choice>
+				<xsd:element name="PERCENTUAL">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:decimal">
+							<xsd:minInclusive value="0"></xsd:minInclusive>
+							<xsd:maxInclusive value="999.99"></xsd:maxInclusive>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="VALOR">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:decimal">
+							<xsd:minInclusive value="0"></xsd:minInclusive>
+							<xsd:maxInclusive value="9999999999999.99"></xsd:maxInclusive>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:choice>
+			<xsd:choice>
+				<xsd:element name="PRAZO">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:short">
+							<xsd:minInclusive value="0"></xsd:minInclusive>
+							<xsd:maxInclusive value="999"></xsd:maxInclusive>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="DATA" type="xsd:date"></xsd:element>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="JUROS_TYPE">
+		<xsd:sequence>
+			<xsd:element name="TIPO">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:short">
+						<xsd:minInclusive value="0"></xsd:minInclusive>
+						<xsd:maxInclusive value="9"></xsd:maxInclusive>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="PERCENTUAL">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:minInclusive value="0"></xsd:minInclusive>
+						<xsd:maxInclusive value="999.99"></xsd:maxInclusive>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="IMPOSTOS_TYPE">
+		<xsd:sequence>
+			<xsd:element name="VALOR_IOF">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:minInclusive value="0"></xsd:minInclusive>
+						<xsd:maxInclusive value="9999999999999.99"></xsd:maxInclusive>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+
+<!-- EXCLUSAO DE SOLICITACAO DE GRUPO DE PAGADORES -->
+
+	<xsd:complexType name="EXCLUI_SOLICITACAO_GRUPO_PAGADOR_TYPE">
+		<xsd:sequence>
+			<xsd:element name="CODIGO_BENEFICIARIO">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="0"></xsd:minInclusive>
+						<xsd:maxInclusive value="999999"></xsd:maxInclusive>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="CODIGO_GRUPO">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:short">
+						<xsd:minInclusive value="0"></xsd:minInclusive>
+						<xsd:maxInclusive value="999"></xsd:maxInclusive>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="DATA_SOLICITACAO" type="xsd:date"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+
+<!-- GENERICOS -->
+
+	<xsd:complexType name="COMPROVANTE_TYPE">
+		<xsd:sequence>
+			<xsd:element name="DATA" type="xsd:date"></xsd:element>
+			<xsd:element name="HORA" type="xsd:time"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+
+
+	<xsd:complexType name="INCLUI_BOLETO_ENTRADA_TYPE">
+		<xsd:complexContent>
+			<xsd:extension base="Q1:inclui_boleto_entrada_Type">
+
+				<xsd:sequence>
+					<xsd:element name="FLAG_REGISTRO" minOccurs="1"
+						maxOccurs="1">
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:enumeration value="S"></xsd:enumeration>
+								<xsd:enumeration value="N"></xsd:enumeration>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="INCLUI_BOLETO_SAIDA_TYPE">
+		<xsd:complexContent>
+			<xsd:extension base="Q1:inclui_boleto_saida_Type"></xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="ALTERA_BOLETO_ENTRADA_TYPE">
+		<xsd:complexContent>
+			<xsd:extension base="Q1:altera_boleto_entrada_Type">
+				<xsd:sequence>
+					<xsd:element name="FLAG_REGISTRO" minOccurs="0"
+						maxOccurs="1">
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:enumeration value="S"></xsd:enumeration>
+								<xsd:enumeration value="N"></xsd:enumeration>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="ALTERA_BOLETO_SAIDA_TYPE">
+		<xsd:complexContent>
+			<xsd:extension base="Q1:altera_boleto_saida_Type"></xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="BAIXA_BOLETO_ENTRADA_TYPE">
+		<xsd:complexContent>
+			<xsd:extension base="Q1:baixa_boleto_entrada_Type"></xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

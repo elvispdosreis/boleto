@@ -1,0 +1,888 @@
+<?xml version="1.0" encoding="UTF-8"?><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://caixa.gov.br/sibar/manutencao_cobranca_bancaria/boleto/externo" xmlns:manutencaocobrancabancaria="http://caixa.gov.br/sibar/manutencao_cobranca_bancaria/boleto/externo" xmlns:sibar_base="http://caixa.gov.br/sibar">
+
+    <xsd:import schemaLocation="../BAR_MSG_BARRAMENTO_LIB/MensagensBarramento.xsd" namespace="http://caixa.gov.br/sibar"></xsd:import>
+    <xsd:complexType name="desconto_Type">
+    	<xsd:sequence>
+    		<xsd:element name="DATA" type="xsd:date" minOccurs="1"
+    			maxOccurs="1">
+    		</xsd:element>
+    		<xsd:choice minOccurs="1" maxOccurs="1"><xsd:element name="VALOR" type="manutencaocobrancabancaria:valor_Type" minOccurs="1" maxOccurs="1">
+    		</xsd:element><xsd:element name="PERCENTUAL" type="manutencaocobrancabancaria:valor_Type" minOccurs="1" maxOccurs="1">
+    		</xsd:element></xsd:choice>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="altera_boleto_desconto_Type">
+    	<xsd:sequence minOccurs="1" maxOccurs="1">
+    		<xsd:element name="DATA" type="xsd:date" minOccurs="0"
+    			maxOccurs="1">
+    		</xsd:element>
+    		<xsd:choice minOccurs="1" maxOccurs="1"><xsd:element name="VALOR" type="manutencaocobrancabancaria:valor_Type" minOccurs="0" maxOccurs="1">
+    		</xsd:element><xsd:element name="PERCENTUAL" type="manutencaocobrancabancaria:valor_Type" minOccurs="0" maxOccurs="1">
+    		</xsd:element></xsd:choice>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:simpleType name="valor_Type">
+    	<xsd:restriction base="xsd:decimal">
+    		<xsd:minInclusive value="0"></xsd:minInclusive>
+    		<xsd:maxInclusive value="9999999999999.99"></xsd:maxInclusive>
+    	</xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="percentual_Type">
+    	<xsd:restriction base="xsd:decimal">
+    		<xsd:minInclusive value="0"></xsd:minInclusive>
+    		<xsd:maxInclusive value="9999999999.99999"></xsd:maxInclusive>
+    	</xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:complexType name="descontos_Type">
+    	<xsd:sequence>
+    		<xsd:element name="DESCONTO" type="manutencaocobrancabancaria:desconto_Type" minOccurs="1" maxOccurs="3"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="altera_boleto_descontos_Type">
+    	<xsd:sequence minOccurs="1" maxOccurs="1">
+    		<xsd:element name="DESCONTO" type="manutencaocobrancabancaria:altera_boleto_desconto_Type" minOccurs="1" maxOccurs="3"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="endereco_Type">
+    	<xsd:sequence>
+    		<xsd:element name="LOGRADOURO" minOccurs="1"
+    			maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:maxLength value="40"></xsd:maxLength>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="BAIRRO" minOccurs="1" maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:maxLength value="15"></xsd:maxLength>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="CIDADE" minOccurs="1" maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:maxLength value="15"></xsd:maxLength>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="UF" minOccurs="1" maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:maxLength value="2"></xsd:maxLength>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="CEP" minOccurs="1" maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:int">
+    					<xsd:minInclusive value="0"></xsd:minInclusive>
+    					<xsd:maxInclusive value="99999999"></xsd:maxInclusive>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="altera_boleto_endereco_Type">
+    	<xsd:sequence minOccurs="1" maxOccurs="1">
+    		<xsd:element name="LOGRADOURO" minOccurs="0"
+    			maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:maxLength value="40"></xsd:maxLength>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="BAIRRO" minOccurs="0" maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:maxLength value="15"></xsd:maxLength>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="CIDADE" minOccurs="0" maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:maxLength value="15"></xsd:maxLength>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="UF" minOccurs="0" maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:maxLength value="2"></xsd:maxLength>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="CEP" minOccurs="0" maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:int">
+    					<xsd:minInclusive value="0"></xsd:minInclusive>
+    					<xsd:maxInclusive value="99999999"></xsd:maxInclusive>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+    
+    <xsd:complexType name="mensagens_recibo_pagador_Type">
+    	<xsd:sequence>
+    		<xsd:element name="MENSAGEM" minOccurs="1" maxOccurs="4">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:maxLength value="40"></xsd:maxLength>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="altera_boleto_mensagens_recibo_pagador_Type">
+    	<xsd:sequence minOccurs="1" maxOccurs="1">
+    		<xsd:element name="MENSAGEM" minOccurs="1" maxOccurs="4">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:maxLength value="40"></xsd:maxLength>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="mensagens_ficha_compensacao_Type">
+    	<xsd:sequence>
+    		<xsd:element name="MENSAGEM" minOccurs="1" maxOccurs="2">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:maxLength value="40"></xsd:maxLength>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="altera_boleto_mensagens_ficha_compensacao_Type">
+    	<xsd:sequence minOccurs="1" maxOccurs="1">
+    		<xsd:element name="MENSAGEM" minOccurs="1" maxOccurs="2">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:maxLength value="40"></xsd:maxLength>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="ficha_compensacao_Type">
+    	<xsd:sequence>
+    		<xsd:element name="MENSAGENS" type="manutencaocobrancabancaria:mensagens_ficha_compensacao_Type" minOccurs="1" maxOccurs="1"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="altera_boleto_ficha_compensacao_Type">
+    	<xsd:sequence minOccurs="1" maxOccurs="1">
+    		<xsd:element name="MENSAGENS" type="manutencaocobrancabancaria:altera_boleto_mensagens_ficha_compensacao_Type" minOccurs="1" maxOccurs="1"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="recibo_pagador_Type">
+    	<xsd:sequence>
+    		<xsd:element name="MENSAGENS" type="manutencaocobrancabancaria:mensagens_recibo_pagador_Type" minOccurs="1" maxOccurs="1"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="altera_boleto_recibo_pagador_Type">
+    	<xsd:sequence minOccurs="1" maxOccurs="1">
+    		<xsd:element name="MENSAGENS" type="manutencaocobrancabancaria:altera_boleto_mensagens_recibo_pagador_Type" minOccurs="1" maxOccurs="1"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="multa_Type">
+    	<xsd:sequence>
+    		<xsd:element name="DATA" type="xsd:date" minOccurs="1"
+    			maxOccurs="1">
+    		</xsd:element>
+    		<xsd:choice minOccurs="1" maxOccurs="1"><xsd:element name="VALOR" type="manutencaocobrancabancaria:valor_Type" minOccurs="1" maxOccurs="1">
+    		</xsd:element><xsd:element name="PERCENTUAL" type="manutencaocobrancabancaria:valor_Type" minOccurs="1" maxOccurs="1">
+    		</xsd:element></xsd:choice>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="altera_boleto_multa_Type">
+    	<xsd:sequence minOccurs="1" maxOccurs="1">
+    		<xsd:element name="DATA" type="xsd:date" minOccurs="0"
+    			maxOccurs="1">
+    		</xsd:element>
+    		<xsd:choice minOccurs="1" maxOccurs="1"><xsd:element name="VALOR" type="manutencaocobrancabancaria:valor_Type" minOccurs="0" maxOccurs="1">
+    		</xsd:element><xsd:element name="PERCENTUAL" type="manutencaocobrancabancaria:valor_Type" minOccurs="0" maxOccurs="1">
+    		</xsd:element></xsd:choice>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:simpleType name="cpf_Type">
+    	<xsd:restriction base="xsd:long">
+    		<xsd:minInclusive value="0"></xsd:minInclusive>
+    		<xsd:maxInclusive value="99999999999"></xsd:maxInclusive>
+    	</xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="cnpj_Type">
+    	<xsd:restriction base="xsd:long">
+    		<xsd:minInclusive value="0"></xsd:minInclusive>
+    		<xsd:maxInclusive value="99999999999999"></xsd:maxInclusive>
+    	</xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:complexType name="sacador_avalista_Type">
+        <xsd:choice minOccurs="1" maxOccurs="1">
+        	<xsd:sequence minOccurs="1" maxOccurs="1">
+        		<xsd:element name="CPF" type="manutencaocobrancabancaria:cpf_Type" minOccurs="1" maxOccurs="1"></xsd:element>
+        		<xsd:element name="NOME" minOccurs="1" maxOccurs="1">
+        			<xsd:simpleType>
+        				<xsd:restriction base="xsd:string">
+        					<xsd:maxLength value="40"></xsd:maxLength>
+        				</xsd:restriction>
+        			</xsd:simpleType>
+        		</xsd:element>
+        	</xsd:sequence>
+        	<xsd:sequence minOccurs="1" maxOccurs="1">
+        		<xsd:element name="CNPJ" type="manutencaocobrancabancaria:cnpj_Type" minOccurs="1" maxOccurs="1"></xsd:element>
+        		<xsd:element name="RAZAO_SOCIAL" minOccurs="1"
+        			maxOccurs="1">
+        			<xsd:simpleType>
+        				<xsd:restriction base="xsd:string">
+        					<xsd:maxLength value="40"></xsd:maxLength>
+        				</xsd:restriction>
+        			</xsd:simpleType>
+        		</xsd:element>
+        	</xsd:sequence>
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="altera_boleto_sacador_avalista_Type">
+        <xsd:choice minOccurs="1" maxOccurs="1">
+        	<xsd:sequence minOccurs="1" maxOccurs="1">
+        		<xsd:element name="CPF" type="manutencaocobrancabancaria:cpf_Type" minOccurs="0" maxOccurs="1"></xsd:element>
+        		<xsd:element name="NOME" minOccurs="0" maxOccurs="1">
+        			<xsd:simpleType>
+        				<xsd:restriction base="xsd:string">
+        					<xsd:maxLength value="40"></xsd:maxLength>
+        				</xsd:restriction>
+        			</xsd:simpleType>
+        		</xsd:element>
+        	</xsd:sequence>
+        	<xsd:sequence minOccurs="1" maxOccurs="1">
+        		<xsd:element name="CNPJ" type="manutencaocobrancabancaria:cnpj_Type" minOccurs="0" maxOccurs="1"></xsd:element>
+        		<xsd:element name="RAZAO_SOCIAL" minOccurs="0"
+        			maxOccurs="1">
+        			<xsd:simpleType>
+        				<xsd:restriction base="xsd:string">
+        					<xsd:maxLength value="40"></xsd:maxLength>
+        				</xsd:restriction>
+        			</xsd:simpleType>
+        		</xsd:element>
+        	</xsd:sequence>
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="pagador_Type">
+    	<xsd:sequence>
+    		<xsd:choice minOccurs="1" maxOccurs="1">
+    			<xsd:sequence minOccurs="1" maxOccurs="1">
+    				<xsd:element name="CPF" type="manutencaocobrancabancaria:cpf_Type" minOccurs="1" maxOccurs="1"></xsd:element>
+    				<xsd:element name="NOME" minOccurs="1"
+    					maxOccurs="1">
+    					<xsd:simpleType>
+    						<xsd:restriction base="xsd:string">
+    							<xsd:maxLength value="40"></xsd:maxLength>
+    						</xsd:restriction>
+    					</xsd:simpleType>
+    				</xsd:element>
+    			</xsd:sequence>
+    			<xsd:sequence minOccurs="1" maxOccurs="1">
+    				<xsd:element name="CNPJ" type="manutencaocobrancabancaria:cnpj_Type" minOccurs="1" maxOccurs="1"></xsd:element>
+    				<xsd:element name="RAZAO_SOCIAL" minOccurs="1"
+    					maxOccurs="1">
+    					<xsd:simpleType>
+    						<xsd:restriction base="xsd:string">
+    							<xsd:maxLength value="40"></xsd:maxLength>
+    						</xsd:restriction>
+    					</xsd:simpleType>
+    				</xsd:element>
+    			</xsd:sequence>
+    		</xsd:choice>
+    		<xsd:element name="ENDERECO" type="manutencaocobrancabancaria:endereco_Type" minOccurs="0" maxOccurs="1"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="altera_boleto_pagador_Type">
+    	<xsd:sequence minOccurs="1" maxOccurs="1">
+    		<xsd:choice minOccurs="1" maxOccurs="1">
+                <xsd:element name="NOME" minOccurs="0" maxOccurs="1">
+    					<xsd:simpleType>
+    						<xsd:restriction base="xsd:string">
+    							<xsd:maxLength value="40"></xsd:maxLength>
+    						</xsd:restriction>
+    					</xsd:simpleType>
+    				</xsd:element>
+                <xsd:element name="RAZAO_SOCIAL" minOccurs="0" maxOccurs="1">
+    					<xsd:simpleType>
+    						<xsd:restriction base="xsd:string">
+    							<xsd:maxLength value="40"></xsd:maxLength>
+    						</xsd:restriction>
+    					</xsd:simpleType>
+    				</xsd:element>
+            </xsd:choice>
+    		<xsd:element name="ENDERECO" type="manutencaocobrancabancaria:altera_boleto_endereco_Type" minOccurs="0" maxOccurs="1"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="pos_vencimento_Type">
+    	<xsd:sequence>
+    		<xsd:element name="ACAO" minOccurs="1" maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:enumeration value="PROTESTAR"></xsd:enumeration>
+    					<xsd:enumeration value="DEVOLVER"></xsd:enumeration>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="NUMERO_DIAS" minOccurs="1"
+    			maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:short">
+    					<xsd:minInclusive value="0"></xsd:minInclusive>
+    					<xsd:maxInclusive value="999"></xsd:maxInclusive>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="altera_boleto_pos_vencimento_Type">
+    	<xsd:sequence minOccurs="1" maxOccurs="1">
+    		<xsd:element name="ACAO" minOccurs="0" maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:enumeration value="PROTESTAR"></xsd:enumeration>
+    					<xsd:enumeration value="DEVOLVER"></xsd:enumeration>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="NUMERO_DIAS" minOccurs="0"
+    			maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:short">
+    					<xsd:minInclusive value="0"></xsd:minInclusive>
+    					<xsd:maxInclusive value="999"></xsd:maxInclusive>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="juros_mora_Type">
+    	<xsd:sequence>
+    		<xsd:element name="TIPO" minOccurs="1" maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:enumeration value="VALOR_POR_DIA"></xsd:enumeration>
+    					<xsd:enumeration value="TAXA_MENSAL"></xsd:enumeration>
+    					<xsd:enumeration value="ISENTO"></xsd:enumeration>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="DATA" type="xsd:date" minOccurs="0"
+    			maxOccurs="1">
+    		</xsd:element>
+    		<xsd:choice minOccurs="1" maxOccurs="1">
+    			<xsd:element name="VALOR"
+    				type="manutencaocobrancabancaria:valor_Type" minOccurs="1"
+    				maxOccurs="1">
+    			</xsd:element>
+    			<xsd:element name="PERCENTUAL"
+    				type="manutencaocobrancabancaria:valor_Type" minOccurs="1"
+    				maxOccurs="1">
+    			</xsd:element>
+    		</xsd:choice>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+	<xsd:complexType name="altera_boleto_juros_mora_Type">
+    	<xsd:sequence minOccurs="1" maxOccurs="1">
+    		<xsd:element name="TIPO" minOccurs="0" maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:enumeration value="VALOR_POR_DIA"></xsd:enumeration>
+    					<xsd:enumeration value="TAXA_MENSAL"></xsd:enumeration>
+    					<xsd:enumeration value="ISENTO"></xsd:enumeration>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="DATA" type="xsd:date" minOccurs="0" maxOccurs="1"></xsd:element>
+    		<xsd:choice minOccurs="1" maxOccurs="1"><xsd:element name="VALOR" type="manutencaocobrancabancaria:valor_Type" minOccurs="0" maxOccurs="1"></xsd:element><xsd:element name="PERCENTUAL" type="manutencaocobrancabancaria:valor_Type" minOccurs="0" maxOccurs="1"></xsd:element></xsd:choice>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+
+    <xsd:complexType name="titulo_entrada_Type">
+    	<xsd:sequence>
+    		<xsd:element name="NOSSO_NUMERO" minOccurs="0"
+    			maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:long">
+    					<xsd:minInclusive value="0"></xsd:minInclusive>
+    					<xsd:maxInclusive value="99999999999999999"></xsd:maxInclusive>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="NUMERO_DOCUMENTO" minOccurs="1"
+    			maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:maxLength value="11"></xsd:maxLength>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="DATA_VENCIMENTO" type="xsd:date"
+    			minOccurs="1" maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element name="VALOR"
+    			type="manutencaocobrancabancaria:valor_Type" minOccurs="1"
+    			maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element name="TIPO_ESPECIE" minOccurs="1"
+    			maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:short">
+    					<xsd:minInclusive value="0"></xsd:minInclusive>
+    					<xsd:maxInclusive value="99"></xsd:maxInclusive>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="FLAG_ACEITE" minOccurs="1"
+    			maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:enumeration value="S"></xsd:enumeration>
+    					<xsd:enumeration value="N"></xsd:enumeration>
+    					<xsd:maxLength value="1"></xsd:maxLength>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="DATA_EMISSAO" type="xsd:date"
+    			minOccurs="0" maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element name="JUROS_MORA"
+    			type="manutencaocobrancabancaria:juros_mora_Type" minOccurs="1"
+    			maxOccurs="1">
+    		</xsd:element>
+            <xsd:element name="VALOR_ABATIMENTO" type="manutencaocobrancabancaria:valor_Type" minOccurs="0" maxOccurs="1"></xsd:element>
+            <xsd:element name="POS_VENCIMENTO" type="manutencaocobrancabancaria:pos_vencimento_Type" minOccurs="1" maxOccurs="1"></xsd:element>
+            <xsd:element name="CODIGO_MOEDA" minOccurs="1"
+    			maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:short">
+    					<xsd:minInclusive value="0"></xsd:minInclusive>
+    					<xsd:maxInclusive value="99"></xsd:maxInclusive>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="PAGADOR"
+    			type="manutencaocobrancabancaria:pagador_Type" minOccurs="1"
+    			maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element name="SACADOR_AVALISTA"
+    			type="manutencaocobrancabancaria:sacador_avalista_Type"
+    			minOccurs="0" maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element name="MULTA"
+    			type="manutencaocobrancabancaria:multa_Type" minOccurs="0"
+    			maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element name="DESCONTOS"
+    			type="manutencaocobrancabancaria:descontos_Type" minOccurs="0"
+    			maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element name="VALOR_IOF"
+    			type="manutencaocobrancabancaria:valor_Type" minOccurs="0"
+    			maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element name="IDENTIFICACAO_EMPRESA" minOccurs="0"
+    			maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:maxLength value="25"></xsd:maxLength>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="FICHA_COMPENSACAO"
+    			type="manutencaocobrancabancaria:ficha_compensacao_Type"
+    			minOccurs="0" maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element name="RECIBO_PAGADOR"
+    			type="manutencaocobrancabancaria:recibo_pagador_Type"
+    			minOccurs="0" maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element name="PAGAMENTO"
+    			type="manutencaocobrancabancaria:pagamento_Type" minOccurs="0"
+    			maxOccurs="1">
+    		</xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="altera_boleto_titulo_entrada_Type">
+    	<xsd:sequence>
+    		<xsd:element name="NOSSO_NUMERO" minOccurs="1"
+    			maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:long">
+    					<xsd:minInclusive value="0"></xsd:minInclusive>
+    					<xsd:maxInclusive value="99999999999999999"></xsd:maxInclusive>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="NUMERO_DOCUMENTO" minOccurs="0"
+    			maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:maxLength value="11"></xsd:maxLength>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="DATA_VENCIMENTO" type="xsd:date"
+    			minOccurs="0" maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element name="VALOR"
+    			type="manutencaocobrancabancaria:valor_Type" minOccurs="0"
+    			maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element name="TIPO_ESPECIE" minOccurs="0"
+    			maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:short">
+    					<xsd:minInclusive value="0"></xsd:minInclusive>
+    					<xsd:maxInclusive value="99"></xsd:maxInclusive>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="FLAG_ACEITE" minOccurs="0"
+    			maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:enumeration value="S"></xsd:enumeration>
+    					<xsd:enumeration value="N"></xsd:enumeration>
+    					<xsd:maxLength value="1"></xsd:maxLength>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="JUROS_MORA"
+    			type="manutencaocobrancabancaria:altera_boleto_juros_mora_Type" minOccurs="0"
+    			maxOccurs="1">
+    		</xsd:element>
+            <xsd:element name="POS_VENCIMENTO" type="manutencaocobrancabancaria:altera_boleto_pos_vencimento_Type" minOccurs="0" maxOccurs="1"></xsd:element>
+    		<xsd:element name="PAGADOR"
+    			type="manutencaocobrancabancaria:altera_boleto_pagador_Type" minOccurs="0"
+    			maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element name="SACADOR_AVALISTA"
+    			type="manutencaocobrancabancaria:altera_boleto_sacador_avalista_Type"
+    			minOccurs="0" maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element name="MULTA"
+    			type="manutencaocobrancabancaria:altera_boleto_multa_Type" minOccurs="0"
+    			maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element name="DESCONTOS"
+    			type="manutencaocobrancabancaria:altera_boleto_descontos_Type" minOccurs="0"
+    			maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element name="VALOR_IOF"
+    			type="manutencaocobrancabancaria:valor_Type" minOccurs="0"
+    			maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element name="IDENTIFICACAO_EMPRESA" minOccurs="0"
+    			maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:maxLength value="25"></xsd:maxLength>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="FICHA_COMPENSACAO"
+    			type="manutencaocobrancabancaria:altera_boleto_ficha_compensacao_Type"
+    			minOccurs="0" maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element name="RECIBO_PAGADOR"
+    			type="manutencaocobrancabancaria:altera_boleto_recibo_pagador_Type"
+    			minOccurs="0" maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element name="PAGAMENTO"
+    			type="manutencaocobrancabancaria:altera_boleto_pagamento_Type" minOccurs="0"
+    			maxOccurs="1">
+    		</xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="pagamento_Type">
+    	<xsd:sequence>
+    		<xsd:element name="QUANTIDADE_PERMITIDA" minOccurs="1"
+    			maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:short">
+    					<xsd:minInclusive value="0"></xsd:minInclusive>
+    					<xsd:maxInclusive value="99"></xsd:maxInclusive>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="TIPO" minOccurs="1" maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:enumeration
+    						value="ACEITA_QUALQUER_VALOR">
+    					</xsd:enumeration>
+    					<xsd:enumeration
+    						value="ACEITA_VALORES_ENTRE_MINIMO_MAXIMO">
+    					</xsd:enumeration>
+    					<xsd:enumeration value="NAO_ACEITA_VALOR_DIVERGENTE"></xsd:enumeration>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:choice minOccurs="1" maxOccurs="1">
+    			<xsd:sequence>
+    				<xsd:element name="VALOR_MINIMO"
+    					type="manutencaocobrancabancaria:valor_Type" minOccurs="1" maxOccurs="1">
+    				</xsd:element>
+    				<xsd:element name="VALOR_MAXIMO"
+    					type="manutencaocobrancabancaria:valor_Type" minOccurs="1" maxOccurs="1">
+    				</xsd:element>
+    			</xsd:sequence>
+    			<xsd:sequence>
+    				<xsd:element name="PERCENTUAL_MINIMO"
+    					type="manutencaocobrancabancaria:percentual_Type" minOccurs="1" maxOccurs="1">
+    				</xsd:element>
+    				<xsd:element name="PERCENTUAL_MAXIMO" type="manutencaocobrancabancaria:percentual_Type" minOccurs="1" maxOccurs="1"></xsd:element>
+    			</xsd:sequence>
+    		</xsd:choice>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="altera_boleto_pagamento_Type">
+    	<xsd:sequence minOccurs="1" maxOccurs="1">
+    		<xsd:element name="QUANTIDADE_PERMITIDA" minOccurs="0"
+    			maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:short">
+    					<xsd:minInclusive value="0"></xsd:minInclusive>
+    					<xsd:maxInclusive value="99"></xsd:maxInclusive>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="TIPO" minOccurs="0" maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:enumeration
+    						value="ACEITA_QUALQUER_VALOR">
+    					</xsd:enumeration>
+    					<xsd:enumeration
+    						value="ACEITA_VALORES_ENTRE_MINIMO_MAXIMO">
+    					</xsd:enumeration>
+    					<xsd:enumeration value="NAO_ACEITA_VALOR_DIVERGENTE"></xsd:enumeration>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:choice minOccurs="1" maxOccurs="1">
+    			<xsd:sequence minOccurs="1" maxOccurs="1">
+    				<xsd:element name="VALOR_MINIMO"
+    					type="manutencaocobrancabancaria:valor_Type" minOccurs="0" maxOccurs="1">
+    				</xsd:element>
+    				<xsd:element name="VALOR_MAXIMO"
+    					type="manutencaocobrancabancaria:valor_Type" minOccurs="0" maxOccurs="1">
+    				</xsd:element>
+    			</xsd:sequence>
+    			<xsd:sequence minOccurs="1" maxOccurs="1">
+    				<xsd:element name="PERCENTUAL_MINIMO"
+    					type="manutencaocobrancabancaria:percentual_Type" minOccurs="0" maxOccurs="1">
+    				</xsd:element>
+    				<xsd:element name="PERCENTUAL_MAXIMO" type="manutencaocobrancabancaria:percentual_Type" minOccurs="0" maxOccurs="1"></xsd:element>
+    			</xsd:sequence>
+    		</xsd:choice>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="inclui_boleto_entrada_Type">
+    	<xsd:sequence>
+    		<xsd:element name="CODIGO_BENEFICIARIO" minOccurs="1"
+    			maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:int">
+    					<xsd:minInclusive value="0"></xsd:minInclusive>
+    					<xsd:maxInclusive value="999999"></xsd:maxInclusive>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="TITULO" type="manutencaocobrancabancaria:titulo_entrada_Type" minOccurs="1" maxOccurs="1"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="dados_entrada_Type">
+        <xsd:choice minOccurs="1" maxOccurs="1">
+        	<xsd:element name="INCLUI_BOLETO"
+        		type="manutencaocobrancabancaria:inclui_boleto_entrada_Type"
+        		minOccurs="1" maxOccurs="1">
+        	</xsd:element>
+        	<xsd:element name="BAIXA_BOLETO"
+        		type="manutencaocobrancabancaria:baixa_boleto_entrada_Type"
+        		minOccurs="1" maxOccurs="1">
+        	</xsd:element>
+        	<xsd:element name="ALTERA_BOLETO" type="manutencaocobrancabancaria:altera_boleto_entrada_Type" minOccurs="1" maxOccurs="1"></xsd:element>
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="servico_entrada_negocial_Type">
+    	<xsd:complexContent>
+    		<xsd:extension base="sibar_base:SERVICO_ENTRADA_TYPE">
+    			<xsd:sequence>
+    				<xsd:element name="DADOS" type="manutencaocobrancabancaria:dados_entrada_Type" minOccurs="1" maxOccurs="1"></xsd:element>
+    			</xsd:sequence>
+    		</xsd:extension>
+    	</xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="inclui_boleto_saida_Type">
+    	<xsd:sequence>
+    		<xsd:element name="CODIGO_BARRAS" minOccurs="1"
+    			maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:maxLength value="44"></xsd:maxLength>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="LINHA_DIGITAVEL" minOccurs="1" maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:maxLength value="47"></xsd:maxLength>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="NOSSO_NUMERO" minOccurs="1"
+    			maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:long">
+    					<xsd:minInclusive value="0"></xsd:minInclusive>
+    					<xsd:maxInclusive value="99999999999999999"></xsd:maxInclusive>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="URL" minOccurs="1" maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:maxLength value="255"></xsd:maxLength>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="dados_saida_Type">
+    	<xsd:complexContent>
+    		<xsd:extension base="sibar_base:DADOS_SAIDA_TYPE">
+                <xsd:choice minOccurs="1" maxOccurs="1">
+                	<xsd:element name="INCLUI_BOLETO"
+                		type="manutencaocobrancabancaria:inclui_boleto_saida_Type"
+                		minOccurs="1" maxOccurs="1">
+                	</xsd:element>
+                	<xsd:element name="ALTERA_BOLETO" type="manutencaocobrancabancaria:altera_boleto_saida_Type" minOccurs="1" maxOccurs="1"></xsd:element>
+                </xsd:choice>
+    		</xsd:extension>
+    	</xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="servico_saida_negocial_Type">
+    	<xsd:complexContent>
+    		<xsd:extension base="sibar_base:SERVICO_SAIDA_TYPE">
+    			<xsd:sequence>
+    				<xsd:element name="DADOS" type="manutencaocobrancabancaria:dados_saida_Type" minOccurs="0" maxOccurs="1"></xsd:element>
+    			</xsd:sequence>
+    		</xsd:extension>
+    	</xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="SERVICO_ENTRADA" type="manutencaocobrancabancaria:servico_entrada_negocial_Type"></xsd:element>
+
+    <xsd:element name="SERVICO_SAIDA" type="manutencaocobrancabancaria:servico_saida_negocial_Type"></xsd:element>
+
+    <xsd:complexType name="baixa_boleto_entrada_Type">
+    	<xsd:sequence>
+    		<xsd:element name="CODIGO_BENEFICIARIO" minOccurs="1"
+    			maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:int">
+    					<xsd:minInclusive value="0"></xsd:minInclusive>
+    					<xsd:maxInclusive value="9999999"></xsd:maxInclusive>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="NOSSO_NUMERO" minOccurs="1"
+    			maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:long">
+    					<xsd:minInclusive value="0"></xsd:minInclusive>
+    					<xsd:maxInclusive value="99999999999999999"></xsd:maxInclusive>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="altera_boleto_entrada_Type">
+    	<xsd:sequence>
+    		<xsd:element name="CODIGO_BENEFICIARIO" minOccurs="1"
+    			maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:int">
+    					<xsd:minInclusive value="0"></xsd:minInclusive>
+    					<xsd:maxInclusive value="9999999"></xsd:maxInclusive>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="TITULO" type="manutencaocobrancabancaria:altera_boleto_titulo_entrada_Type" minOccurs="1" maxOccurs="1"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="altera_boleto_saida_Type">
+        <xsd:sequence>
+    		<xsd:element name="CODIGO_BARRAS" minOccurs="0"
+    			maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:maxLength value="44"></xsd:maxLength>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="LINHA_DIGITAVEL" minOccurs="0" maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:maxLength value="47"></xsd:maxLength>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="URL" minOccurs="0" maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:maxLength value="255"></xsd:maxLength>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+</xsd:schema>

@@ -319,7 +319,7 @@ class BrasilService implements InterfaceBank
 
             $context = stream_context_create($httpHeaders);
 
-            $client = new \SoapClient(dirname(__FILE__) . '/../XSD/RegistroCobrancaService.xml',
+            $client = new \SoapClient(dirname(__FILE__) . '/../XSD/Banco do Brasil/RegistroCobrancaService.xml',
                 [
                     'trace' => TRUE,
                     'exceptions' => TRUE,
