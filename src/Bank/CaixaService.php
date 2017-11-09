@@ -236,7 +236,8 @@ class CaixaService implements InterfaceBank
 
         try {
 
-            $client = new CaixaSoapCliente('https://des.barramento.caixa.gov.br/sibar/ManutencaoCobrancaBancaria/Boleto/Externo?wsdl');
+            $client = new CaixaSoapCliente(dirname(__FILE__) . '/../XSD/Caixa/RegistroCobrancaService.wsdl');
+            $client->__setLocation('https://des.barramento.caixa.gov.br/sibar/ManutencaoCobrancaBancaria/Boleto/Externo');
 
             $now = new \DateTime();
 
@@ -290,7 +291,7 @@ class CaixaService implements InterfaceBank
             $endereco->addChild('BAIRRO', $this->pagador->getBairro());
             $endereco->addChild('CIDADE', $this->pagador->getCidade());
             $endereco->addChild('UF', $this->pagador->getUf());
-            $endereco->addChild('CEP',$this->pagador->getCep());
+            $endereco->addChild('CEP', Helper::number($this->pagador->getCep()));
 
 
             $arr = json_decode(json_encode((array)$xml), 1);
