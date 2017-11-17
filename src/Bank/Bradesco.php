@@ -9,8 +9,14 @@
 namespace Boleto\Bank;
 
 
+use Boleto\Entity\Beneficiario;
+use Boleto\Entity\Pagador;
+
 class Bradesco extends AbstractBank implements InterfaceBank
 {
+
+
+
     /**
      * @var \DateTime
      */
@@ -234,4 +240,5 @@ class Bradesco extends AbstractBank implements InterfaceBank
 
         return "$campo1 $campo2 $campo3 $campo4 $campo5";
     }
+
 }

@@ -2,6 +2,9 @@
 
 namespace Boleto\Bank;
 
+use Boleto\Entity\Beneficiario;
+use Boleto\Entity\Pagador;
+
 /**
  * Created by PhpStorm.
  * User: Elvis
@@ -10,6 +13,85 @@ namespace Boleto\Bank;
  */
 class AbstractBank
 {
+    private $pagador;
+    private $beneficiario;
+    private $demostrativo;
+    private $instrucao;
+
+    /**
+     * @param Pagador $pagador
+     * @return $this
+     */
+    public function setPagador(Pagador $pagador)
+    {
+        $this->pagador = $pagador;
+        return $this;
+    }
+
+    /**
+     * @return Pagador
+     */
+    public function getPagador()
+    {
+        return $this->pagador;
+    }
+
+    /**
+     * @return Beneficiario
+     */
+    public function getBeneficiario()
+    {
+        return $this->beneficiario;
+    }
+
+    /**
+     * @param Beneficiario $beneficiario
+     * @return $this
+     */
+    public function setBeneficiario(Beneficiario $beneficiario)
+    {
+        $this->beneficiario = $beneficiario;
+        return $this;
+    }
+
+    /**
+     * @param string[] $demostrativo
+     * @return $this
+     */
+    public function setDemostrativo($demostrativo)
+    {
+        array_push($this->demostrativo, $demostrativo);
+        return $this;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getDemostrativo()
+    {
+        return $this->demostrativo;
+    }
+
+
+    /**
+     * @param string[] $instrucao
+     * @return $this
+     */
+    public function setInstrucao($instrucao)
+    {
+        array_push($this->instrucao, $instrucao);
+        return $this;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getInstrucao()
+    {
+        return $this->instrucao;
+    }
+
+
     // protected $valor;
     //protected $vencimento;
 
