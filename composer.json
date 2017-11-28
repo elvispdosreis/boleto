@@ -3,7 +3,7 @@
   "description": "Boleto Bancario, em desenvolvimento ... ",
   "type": "library",
   "require": {
-    "php-64bit": ">=7.0",
+    "php": ">=7.0",
     "ext-apcu": "*",
     "psr/log": "^1.0",
     "guzzlehttp/guzzle": "^6.3",

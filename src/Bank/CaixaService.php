@@ -237,7 +237,7 @@ class CaixaService implements InterfaceBank
         try {
 
             $client = new CaixaSoapCliente(dirname(__FILE__) . '/../XSD/Caixa/RegistroCobrancaService.wsdl');
-            $client->__setLocation('https://des.barramento.caixa.gov.br/sibar/ManutencaoCobrancaBancaria/Boleto/Externo');
+            $client->__setLocation('https://barramento.caixa.gov.br/sibar/ManutencaoCobrancaBancaria/Boleto/Externo');
 
             $now = new \DateTime();
 
@@ -246,7 +246,7 @@ class CaixaService implements InterfaceBank
             $header = $xml->addChild('HEADER');
             $header->addChild('VERSAO', '1.0');
             $header->addChild('AUTENTICACAO', $this->getHash());
-            $header->addChild('USUARIO_SERVICO', 'SGCBS01D');
+            $header->addChild('USUARIO_SERVICO', 'SGCBS02P');
             $header->addChild('OPERACAO', 'INCLUI_BOLETO');
             $header->addChild('SISTEMA_ORIGEM', 'SIGCB');
             $header->addChild('DATA_HORA', $now->format('YmdHis'));
