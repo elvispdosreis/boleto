@@ -15,8 +15,8 @@ class AbstractBank
 {
     private $pagador;
     private $beneficiario;
-    private $demostrativo;
-    private $instrucao;
+    private $demostrativo = [];
+    private $instrucao = [];
 
     /**
      * @param Pagador $pagador
@@ -90,7 +90,6 @@ class AbstractBank
     {
         return $this->instrucao;
     }
-
 
     // protected $valor;
     //protected $vencimento;
