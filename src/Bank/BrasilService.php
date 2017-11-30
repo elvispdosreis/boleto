@@ -214,7 +214,7 @@ class BrasilService implements InterfaceBank
         if (is_null($this->emissao)) {
             throw new \InvalidArgumentException('Data Emissäo inválido.');
         }
-        return $this->vencimento;
+        return $this->emissao;
     }
 
     /**
@@ -312,6 +312,7 @@ class BrasilService implements InterfaceBank
                     'header' => "Authorization: Bearer " . $token . "\r\n" . "Cache-Control: no-cache"
                 ],
                 'ssl' => [
+                    'verify_peer' => false,
                     'verify_peer_name' => false,
                     'allow_self_signed' => true
                 ]
@@ -326,7 +327,7 @@ class BrasilService implements InterfaceBank
                     'encoding' => 'UTF-8',
                     'compression' => \SOAP_COMPRESSION_ACCEPT | \SOAP_COMPRESSION_GZIP,
                     'cache_wsdl' => WSDL_CACHE_NONE,
-                    'connection_timeout' => 15,
+                    'connection_timeout' => 30,
                     'stream_context' => $context
                 ]
             );
@@ -377,6 +378,7 @@ class BrasilService implements InterfaceBank
             $this->setLinhadigitavel($result->linhaDigitavel);
 
         } catch (\SoapFault $sf) {
+            $a = $client->__getLastRequest();
             throw new \Exception($sf->faultstring, 500);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500, $e);
@@ -393,7 +395,7 @@ class BrasilService implements InterfaceBank
             $item = $this->cache->getItem($key);
             if (!$item->isHit()) {
                 $client = new Client(['auth' => [$this->getClientId(), $this->getSecretId()]]);
-                $res = $client->request('POST', 'https://oauth.hm.bb.com.br/oauth/token', [
+                $res = $client->request('POST', 'https://oauth.bb.com.br/oauth/token', [
                     'headers' => [
                         'Content-Type' => 'application/x-www-form-urlencoded',
                         'Cache-Control' => 'no-cache'
