@@ -9,6 +9,8 @@
 namespace Boleto\Bank;
 
 
+use Boleto\Entity\Juros;
+use Boleto\Entity\Multa;
 use Boleto\Entity\Pagador;
 use Boleto\Exception\InvalidArgumentException;
 use Cache\Adapter\Apcu\ApcuCachePool;
@@ -37,6 +39,16 @@ class BrasilService implements InterfaceBank
      * @var Pagador
      */
     private $pagador;
+
+    /**
+     * @var Juros
+     */
+    private $juros;
+
+    /**
+     * @var Multa
+     */
+    private $multa;
 
     private $clientId;
     private $secretId;
@@ -299,6 +311,43 @@ class BrasilService implements InterfaceBank
         return $this->variacaocarteira;
     }
 
+    /**
+     * @return Juros
+     */
+    public function getJuros(): Juros
+    {
+        return $this->juros;
+    }
+
+    /**
+     * @param Juros $juros
+     * @return BrasilService
+     */
+    public function setJuros(Juros $juros): BrasilService
+    {
+        $this->juros = $juros;
+        return $this;
+    }
+
+    /**
+     * @return Multa
+     */
+    public function getMulta(): Multa
+    {
+        return $this->multa;
+    }
+
+    /**
+     * @param Multa $multa
+     * @return BrasilService
+     */
+    public function setMulta(Multa $multa): BrasilService
+    {
+        $this->multa = $multa;
+        return $this;
+    }
+
+
     public function send()
     {
 
@@ -344,9 +393,45 @@ class BrasilService implements InterfaceBank
             $titulo->addChild('valorOriginalTitulo', $this->getValor());
             $titulo->addChild('codigoTipoDesconto', '');
 
-            $titulo->addChild('codigoTipoJuroMora', 0);
 
-            $titulo->addChild('codigoTipoMulta', 0);
+            $multa = $this->multa;
+            if (!is_null($this->multa)) {
+                if ($multa->getTipo() === 0) {
+                    $titulo->addChild('codigoTipoMulta', 0);
+                } elseif ($multa->getTipo() === 1) {
+                    $titulo->addChild('codigoTipoMulta', 1);
+                    $titulo->addChild('valorMultaTitulo', $multa->getValor());
+                    $titulo->addChild('dataMultaTitulo', $multa->getData()->format('d.m.Y'));
+                } elseif ($multa->getTipo() === 2) {
+                    $titulo->addChild('codigoTipoMulta', 2);
+                    $titulo->addChild('percentualMultaTitulo', $multa->getValor());
+                    $titulo->addChild('dataMultaTitulo', $multa->getData()->format('d.m.Y'));
+                } else {
+                    throw new \InvalidArgumentException('Código do tipo de multa inválido.');
+                }
+            } else {
+                $titulo->addChild('codigoTipoMulta', 0);
+            }
+
+
+            $juros = $this->juros;
+            if (!is_null($this->juros)) {
+                if ($juros->getTipo() === 0) {
+                    $titulo->addChild('codigoTipoJuroMora', 0);
+                } elseif ($juros->getTipo() === 1) {
+                    $titulo->addChild('codigoTipoJuroMora', 1);
+                    $titulo->addChild('valorJuroMoraTitulo', $juros->getValor());
+                } elseif ($juros->getTipo() === 2) {
+                    $titulo->addChild('codigoTipoJuroMora', 2);
+                    $titulo->addChild('percentualJuroMoraTitulo', $juros->getValor());
+                } elseif ($juros->getTipo() === 3) {
+                    $titulo->addChild('codigoTipoJuroMora', 3);
+                } else {
+                    throw new \InvalidArgumentException('Código do tipo de juros inválido.');
+                }
+            } else {
+                $titulo->addChild('codigoTipoJuroMora', 0);
+            }
 
             $titulo->addChild('codigoAceiteTitulo', 'N');
             $titulo->addChild('codigoTipoTitulo', 99);
