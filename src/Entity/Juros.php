@@ -28,7 +28,7 @@ class Juros
 
     /**
      * Juros constructor.
-     * @param string("DIARIO", "MENSAL", "ISENTO") $tipo
+     * @param $tipo
      * @param float $valor
      * @param \DateTime $data
      */
