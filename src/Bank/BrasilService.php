@@ -396,19 +396,9 @@ class BrasilService implements InterfaceBank
 
             $multa = $this->multa;
             if (!is_null($this->multa)) {
-                if ($multa->getTipo() === 0) {
-                    $titulo->addChild('codigoTipoMulta', 0);
-                } elseif ($multa->getTipo() === 1) {
-                    $titulo->addChild('codigoTipoMulta', 1);
-                    $titulo->addChild('valorMultaTitulo', $multa->getValor());
-                    $titulo->addChild('dataMultaTitulo', $multa->getData()->format('d.m.Y'));
-                } elseif ($multa->getTipo() === 2) {
-                    $titulo->addChild('codigoTipoMulta', 2);
-                    $titulo->addChild('percentualMultaTitulo', $multa->getValor());
-                    $titulo->addChild('dataMultaTitulo', $multa->getData()->format('d.m.Y'));
-                } else {
-                    throw new \InvalidArgumentException('Código do tipo de multa inválido.');
-                }
+                $titulo->addChild('codigoTipoMulta', 2);
+                $titulo->addChild('percentualMultaTitulo', $multa->getPercentual());
+                $titulo->addChild('dataMultaTitulo', $multa->getData()->format('d.m.Y'));
             } else {
                 $titulo->addChild('codigoTipoMulta', 0);
             }
@@ -416,16 +406,14 @@ class BrasilService implements InterfaceBank
 
             $juros = $this->juros;
             if (!is_null($this->juros)) {
-                if ($juros->getTipo() === 0) {
+                if ($juros->getTipo() === $this->juros::Isento) {
                     $titulo->addChild('codigoTipoJuroMora', 0);
-                } elseif ($juros->getTipo() === 1) {
+                } elseif ($juros->getTipo() === $this->juros::Diario) {
                     $titulo->addChild('codigoTipoJuroMora', 1);
                     $titulo->addChild('valorJuroMoraTitulo', $juros->getValor());
-                } elseif ($juros->getTipo() === 2) {
+                } elseif ($juros->getTipo() === $this->juros::Mensal) {
                     $titulo->addChild('codigoTipoJuroMora', 2);
                     $titulo->addChild('percentualJuroMoraTitulo', $juros->getValor());
-                } elseif ($juros->getTipo() === 3) {
-                    $titulo->addChild('codigoTipoJuroMora', 3);
                 } else {
                     throw new \InvalidArgumentException('Código do tipo de juros inválido.');
                 }

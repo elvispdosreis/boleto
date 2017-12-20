@@ -11,6 +11,11 @@ namespace Boleto\Entity;
 
 class Juros
 {
+
+    const Diario = 1;
+    const Mensal = 2;
+    const Isento = 3;
+
     private $tipo;
     /**
      * @var double
@@ -23,7 +28,7 @@ class Juros
 
     /**
      * Juros constructor.
-     * @param $tipo
+     * @param string("DIARIO", "MENSAL", "ISENTO") $tipo
      * @param float $valor
      * @param \DateTime $data
      */

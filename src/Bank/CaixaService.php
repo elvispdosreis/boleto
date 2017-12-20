@@ -11,10 +11,11 @@ namespace Boleto\Bank;
 
 use Boleto\Helper\Helper;
 use Boleto\Entity\Beneficiario;
+use Boleto\Entity\Juros;
+use Boleto\Entity\Multa;
 use Boleto\Entity\Pagador;
 use Boleto\Exception\InvalidArgumentException;
 use Boleto\Service\CaixaSoapCliente;
-use Zend\Soap\Client;
 
 
 class CaixaService implements InterfaceBank
@@ -42,6 +43,15 @@ class CaixaService implements InterfaceBank
      */
     private $beneficiario;
 
+    /**
+     * @var Juros
+     */
+    private $juros;
+
+    /**
+     * @var Multa
+     */
+    private $multa;
 
     /**
      * CaixaService constructor.
@@ -230,6 +240,42 @@ class CaixaService implements InterfaceBank
         return $this->convenio;
     }
 
+    /**
+     * @return Juros
+     */
+    public function getJuros(): Juros
+    {
+        return $this->juros;
+    }
+
+    /**
+     * @param Juros $juros
+     * @return CaixaService
+     */
+    public function setJuros(Juros $juros): CaixaService
+    {
+        $this->juros = $juros;
+        return $this;
+    }
+
+    /**
+     * @return Multa
+     */
+    public function getMulta(): Multa
+    {
+        return $this->multa;
+    }
+
+    /**
+     * @param Multa $multa
+     * @return CaixaService
+     */
+    public function setMulta(Multa $multa): CaixaService
+    {
+        $this->multa = $multa;
+        return $this;
+    }
+
 
     public function send()
     {
@@ -264,10 +310,35 @@ class CaixaService implements InterfaceBank
             $titulo->addChild('FLAG_ACEITE', 'S');
             $titulo->addChild('DATA_EMISSAO', $this->getEmissao()->format('Y-m-d'));
 
-            $juros = $titulo->addChild('JUROS_MORA');
-            $juros->addChild('TIPO', 'ISENTO');
-            //$juros->addChild('DATA', 0);
-            $juros->addChild('PERCENTUAL', 0);
+            if (!is_null($this->multa)) {
+                $multa = $titulo->addChild('MULTA');
+                $multa->addChild('DATA', $this->multa->getData()->format('Y-m-d'));
+                $multa->addChild('PERCENTUAL', $this->multa->getPercentual());
+            }
+
+            if (!is_null($this->juros)) {
+                $juros = $titulo->addChild('JUROS_MORA');
+                if ($this->juros->getTipo() === $this->juros::Diario) {
+                    $juros->addChild('TIPO', 'VALOR_POR_DIA');
+                    $juros->addChild('DATA', $this->juros->getData()->format('Y-m-d'));
+                    $juros->addChild('VALOR', $this->juros->getValor());
+                } elseif ($this->juros->getTipo() === $this->juros::Mensal) {
+                    $juros->addChild('TIPO', 'TAXA_MENSAL');
+                    $juros->addChild('DATA', $this->juros->getData()->format('Y-m-d'));
+                    $juros->addChild('PERCENTUAL', $this->juros->getValor());
+                } elseif ($this->juros->getTipo() === $this->juros::Isento) {
+                    $juros->addChild('TIPO', 'ISENTO');
+                    $juros->addChild('VALOR', 0);
+                    $juros->addChild('PERCENTUAL', 0);
+                } else {
+                    throw new \InvalidArgumentException('Código do tipo de juros inválido.');
+                }
+            } else {
+                $juros = $titulo->addChild('JUROS_MORA');
+                $juros->addChild('TIPO', 'ISENTO');
+                $juros->addChild('VALOR', 0);
+                $juros->addChild('PERCENTUAL', 0);
+            }
 
             $titulo->addChild('VALOR_ABATIMENTO', 0);
 
