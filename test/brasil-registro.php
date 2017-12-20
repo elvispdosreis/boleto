@@ -3,13 +3,17 @@ require __DIR__ . '/../vendor/autoload.php';
 
 
 use Boleto\Entity\Pagador;
-
+use Boleto\Entity\Juros;
+use Boleto\Entity\Multa;
 
 try {
 
     $pagador = new Pagador('Fulano da Silva', '62344900187', 'Rua Antenor Guirlanda', '15', null, 'Casa Verde', 'São Paulo', 'SP', '02514-010');
 
     $vencimento = new DateTime('2017-09-27');
+
+    $juros = new Juros(Juros::Mensal, 2, $vencimento->modify('+1 day'));
+    $multa = new Multa(2, $vencimento->modify('+1 day'));
 
     $bb = new \Boleto\Bank\BrasilService();
     $bb->setEmissao($vencimento)
@@ -20,8 +24,8 @@ try {
         ->setConvenio(1014051)
         ->setVariacaoCarteira(19)
         ->setPagador($pagador)
-        ->setClientId('eyJpZCI6IjgwNDNiNTMtZjQ5Mi00YyIsImNvZGlnb1B1YmxpY2Fkb3IiOjEwOSwiY29kaWdvU29mdHdhcmUiOjEsInNlcXVlbmNpYWxJbnN0YWxhY2FvIjoxfQ')
-        ->setSecretId('eyJpZCI6IjBjZDFlMGQtN2UyNC00MGQyLWI0YSIsImNvZGlnb1B1YmxpY2Fkb3IiOjEwOSwiY29kaWdvU29mdHdhcmUiOjEsInNlcXVlbmNpYWxJbnN0YWxhY2FvIjoxLCJzZXF1ZW5jaWFsQ3JlZGVuY2lhbCI6MX0')
+        ->setClientId('')
+        ->setSecretId('')
         ->send();
 
     echo $bb->getLinhaDigitavel();
