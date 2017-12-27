@@ -303,7 +303,7 @@ class CaixaService implements InterfaceBank
 
             $titulo = $incluir->addChild('TITULO');
             $titulo->addChild('NOSSO_NUMERO', '14' . Helper::padLeft($this->getNossoNumero(), 15));
-            $titulo->addChild('NUMERO_DOCUMENTO', $this->getNossoNumero());
+            $titulo->addChild('NUMERO_DOCUMENTO', substr($this->getNossoNumero(), -11));
             $titulo->addChild('DATA_VENCIMENTO', $this->getEmissao()->format('Y-m-d'));
             $titulo->addChild('VALOR', $this->getValor());
             $titulo->addChild('TIPO_ESPECIE', 99);
@@ -351,16 +351,16 @@ class CaixaService implements InterfaceBank
             $pagador = $titulo->addChild('PAGADOR');
             if ($this->pagador->getTipoDocumento() === 'CPF') {
                 $pagador->addChild('CPF', $this->pagador->getDocumento());
-                $pagador->addChild('NOME', $this->pagador->getNome());
+                $pagador->addChild('NOME', substr(str_replace("&", "", $this->pagador->getNome()), 0, 40));
             } else {
                 $pagador->addChild('CNPJ', $this->pagador->getDocumento());
-                $pagador->addChild('RAZAO_SOCIAL', $this->pagador->getNome());
+                $pagador->addChild('RAZAO_SOCIAL', substr(str_replace("&", "", $this->pagador->getNome()), 0,40));
             }
 
             $endereco = $pagador->addChild('ENDERECO');
-            $endereco->addChild('LOGRADOURO', $this->pagador->getLogradouro() . ' ' . $this->pagador->getNumero());
-            $endereco->addChild('BAIRRO', $this->pagador->getBairro());
-            $endereco->addChild('CIDADE', $this->pagador->getCidade());
+            $endereco->addChild('LOGRADOURO', substr(str_replace("&", "", $this->pagador->getLogradouro()) . ' ' . $this->pagador->getNumero(), 0,40));
+            $endereco->addChild('BAIRRO', substr(str_replace("&", "", $this->pagador->getBairro()), 0,15));
+            $endereco->addChild('CIDADE', substr(str_replace("&", "", $this->pagador->getCidade()), 0,15));
             $endereco->addChild('UF', $this->pagador->getUf());
             $endereco->addChild('CEP', Helper::number($this->pagador->getCep()));
 
