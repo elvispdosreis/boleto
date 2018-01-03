@@ -32,6 +32,9 @@ class CaixaService implements InterfaceBank
     private $carteira;
     private $codigobarras;
     private $linhadigitavel;
+    private $prazodevolucao;
+
+
 
     /**
      * @var Pagador
@@ -69,6 +72,7 @@ class CaixaService implements InterfaceBank
         $this->nossonumero = $nossonumero;
         $this->convenio = $convenio;
         $this->pagador = $pagador;
+        $this->prazodevolucao = 29;
     }
 
     /**
@@ -276,6 +280,23 @@ class CaixaService implements InterfaceBank
         return $this;
     }
 
+    /**
+     * @return int
+     */
+    public function getPrazoDevolucao()
+    {
+        return $this->prazodevolucao;
+    }
+
+    /**
+     * @param mixed $prazodevolucao
+     * @return CaixaService
+     */
+    public function setPrazoDevolucao(int $prazodevolucao)
+    {
+        $this->prazodevolucao = $prazodevolucao;
+        return $this;
+    }
 
     public function send()
     {
@@ -344,7 +365,7 @@ class CaixaService implements InterfaceBank
 
             $pos = $titulo->addChild('POS_VENCIMENTO');
             $pos->addChild('ACAO', 'DEVOLVER');
-            $pos->addChild('NUMERO_DIAS', '0');
+            $pos->addChild('NUMERO_DIAS', $this->getPrazoDevolucao());
 
             $titulo->addChild('CODIGO_MOEDA', '09');
 
