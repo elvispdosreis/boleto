@@ -13,7 +13,8 @@ class Helper
 {
 
 
-    public static function number($str){
+    public static function number($str)
+    {
         return preg_replace("/[^0-9]/", "", $str);
     }
 
@@ -53,7 +54,7 @@ class Helper
 
     public static function padLeft($str, $length)
     {
-       return str_pad(self::number($str), $length, "0", STR_PAD_LEFT);
+        return str_pad(self::number($str), $length, "0", STR_PAD_LEFT);
     }
 
     public static function utf8_converter($array)
@@ -69,7 +70,7 @@ class Helper
 
     public static function floatVal($number)
     {
-        if(!is_numeric($number)) {
+        if (!is_numeric($number)) {
             $number = str_replace(['.', ','], ['', '.'], $number);
         }
         return floatval($number);
@@ -77,7 +78,7 @@ class Helper
 
     public static function intVal($number)
     {
-        if(!is_numeric($number)) {
+        if (!is_numeric($number)) {
             $number = str_replace(['.', ','], ['', '.'], $number);
         }
         return intval($number);
@@ -85,10 +86,15 @@ class Helper
 
     public static function numberFormat($number)
     {
-        if(!is_numeric($number)) {
+        if (!is_numeric($number)) {
             $number = str_replace(['.', ','], ['', '.'], $number);
         }
         return number_format($number, 2, '.', '');
+    }
+
+    public static function ascii($string)
+    {
+        return preg_replace('/[`^~\'"]/', null, str_replace('?', '', iconv('UTF-8', 'ASCII//TRANSLIT', $string)));
     }
 
 

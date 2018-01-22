@@ -372,17 +372,17 @@ class CaixaService implements InterfaceBank
             $pagador = $titulo->addChild('PAGADOR');
             if ($this->pagador->getTipoDocumento() === 'CPF') {
                 $pagador->addChild('CPF', $this->pagador->getDocumento());
-                $pagador->addChild('NOME', substr(str_replace("&", "", $this->pagador->getNome()), 0, 40));
+                $pagador->addChild('NOME', substr(str_replace("&", "", Helper::ascii($this->pagador->getNome())), 0, 40));
             } else {
                 $pagador->addChild('CNPJ', $this->pagador->getDocumento());
-                $pagador->addChild('RAZAO_SOCIAL', substr(str_replace("&", "", $this->pagador->getNome()), 0,40));
+                $pagador->addChild('RAZAO_SOCIAL', substr(str_replace("&", "", Helper::ascii($this->pagador->getNome())), 0,40));
             }
 
             $endereco = $pagador->addChild('ENDERECO');
-            $endereco->addChild('LOGRADOURO', substr(str_replace("&", "", $this->pagador->getLogradouro()) . ' ' . $this->pagador->getNumero(), 0,40));
-            $endereco->addChild('BAIRRO', substr(str_replace("&", "", $this->pagador->getBairro()), 0,15));
-            $endereco->addChild('CIDADE', substr(str_replace("&", "", $this->pagador->getCidade()), 0,15));
-            $endereco->addChild('UF', $this->pagador->getUf());
+            $endereco->addChild('LOGRADOURO', substr(str_replace("&", "", Helper::ascii($this->pagador->getLogradouro())) . ' ' . $this->pagador->getNumero(), 0,40));
+            $endereco->addChild('BAIRRO', substr(str_replace("&", "", Helper::ascii($this->pagador->getBairro())), 0,15));
+            $endereco->addChild('CIDADE', substr(str_replace("&", "", Helper::ascii($this->pagador->getCidade())), 0,15));
+            $endereco->addChild('UF', Helper::ascii($this->pagador->getUf()));
             $endereco->addChild('CEP', Helper::number($this->pagador->getCep()));
 
 
@@ -390,14 +390,19 @@ class CaixaService implements InterfaceBank
 
             $result = $client->__soapCall("INCLUI_BOLETO", [$arr]);
 
+            if(!isset($result->DADOS->CONTROLE_NEGOCIAL)){
+                throw new InvalidArgumentException($result->COD_RETORNO, trim($result->RETORNO));
+            }
+
             if ($result->DADOS->CONTROLE_NEGOCIAL->COD_RETORNO !== "0") {
-                throw new InvalidArgumentException($result->DADOS->CONTROLE_NEGOCIAL->MENSAGENS->RETORNO, trim($result->DADOS->CONTROLE_NEGOCIAL->COD_RETORNO));
+                throw new InvalidArgumentException(trim($result->DADOS->CONTROLE_NEGOCIAL->COD_RETORNO), $result->DADOS->CONTROLE_NEGOCIAL->MENSAGENS->RETORNO);
             }
 
             $this->setCodigobarras($result->DADOS->INCLUI_BOLETO->CODIGO_BARRAS);
             $this->setLinhadigitavel($result->DADOS->INCLUI_BOLETO->LINHA_DIGITAVEL);
 
         } catch (\SoapFault $sf) {
+            $a = $client->__getLastRequest();
             throw new \Exception($sf->faultstring, 500);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500, $e);
