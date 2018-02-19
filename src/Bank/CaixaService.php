@@ -35,7 +35,6 @@ class CaixaService implements InterfaceBank
     private $prazodevolucao;
 
 
-
     /**
      * @var Pagador
      */
@@ -328,7 +327,7 @@ class CaixaService implements InterfaceBank
             $titulo->addChild('DATA_VENCIMENTO', $this->getEmissao()->format('Y-m-d'));
             $titulo->addChild('VALOR', $this->getValor());
             $titulo->addChild('TIPO_ESPECIE', 99);
-            $titulo->addChild('FLAG_ACEITE', 'S');
+            $titulo->addChild('FLAG_ACEITE', 'N');
             $titulo->addChild('DATA_EMISSAO', $this->getEmissao()->format('Y-m-d'));
 
             if (!is_null($this->multa)) {
@@ -375,13 +374,13 @@ class CaixaService implements InterfaceBank
                 $pagador->addChild('NOME', substr(str_replace("&", "", Helper::ascii($this->pagador->getNome())), 0, 40));
             } else {
                 $pagador->addChild('CNPJ', $this->pagador->getDocumento());
-                $pagador->addChild('RAZAO_SOCIAL', substr(str_replace("&", "", Helper::ascii($this->pagador->getNome())), 0,40));
+                $pagador->addChild('RAZAO_SOCIAL', substr(str_replace("&", "", Helper::ascii($this->pagador->getNome())), 0, 40));
             }
 
             $endereco = $pagador->addChild('ENDERECO');
-            $endereco->addChild('LOGRADOURO', substr(str_replace("&", "", Helper::ascii($this->pagador->getLogradouro())) . ' ' . $this->pagador->getNumero(), 0,40));
-            $endereco->addChild('BAIRRO', substr(str_replace("&", "", Helper::ascii($this->pagador->getBairro())), 0,15));
-            $endereco->addChild('CIDADE', substr(str_replace("&", "", Helper::ascii($this->pagador->getCidade())), 0,15));
+            $endereco->addChild('LOGRADOURO', substr(str_replace("&", "", Helper::ascii($this->pagador->getLogradouro())) . ' ' . $this->pagador->getNumero(), 0, 40));
+            $endereco->addChild('BAIRRO', substr(str_replace("&", "", Helper::ascii($this->pagador->getBairro())), 0, 15));
+            $endereco->addChild('CIDADE', substr(str_replace("&", "", Helper::ascii($this->pagador->getCidade())), 0, 15));
             $endereco->addChild('UF', Helper::ascii($this->pagador->getUf()));
             $endereco->addChild('CEP', Helper::number($this->pagador->getCep()));
 
@@ -390,19 +389,26 @@ class CaixaService implements InterfaceBank
 
             $result = $client->__soapCall("INCLUI_BOLETO", [$arr]);
 
-            if(!isset($result->DADOS->CONTROLE_NEGOCIAL)){
+            //file_put_contents('C:/home/tmp/' . $this->getNossoNumero() . '.txt', print_r($result, true));
+
+            if (!isset($result->DADOS->CONTROLE_NEGOCIAL)) {
                 throw new InvalidArgumentException($result->COD_RETORNO, trim($result->RETORNO));
             }
 
             if ($result->DADOS->CONTROLE_NEGOCIAL->COD_RETORNO !== "0") {
-                throw new InvalidArgumentException(trim($result->DADOS->CONTROLE_NEGOCIAL->COD_RETORNO), $result->DADOS->CONTROLE_NEGOCIAL->MENSAGENS->RETORNO);
+                if (preg_match('/\((.*?)\)/i', $result->DADOS->CONTROLE_NEGOCIAL->MENSAGENS->RETORNO, $match)) {
+                    $codigo = trim($match[1]);
+                } else {
+                    $checksum = crc32(trim($result->DADOS->CONTROLE_NEGOCIAL->MENSAGENS->RETORNO));
+                    $codigo = sprintf("%u\n", $checksum);
+                }
+                throw new InvalidArgumentException($codigo, $result->DADOS->CONTROLE_NEGOCIAL->MENSAGENS->RETORNO);
             }
 
             $this->setCodigobarras($result->DADOS->INCLUI_BOLETO->CODIGO_BARRAS);
             $this->setLinhadigitavel($result->DADOS->INCLUI_BOLETO->LINHA_DIGITAVEL);
 
         } catch (\SoapFault $sf) {
-            $a = $client->__getLastRequest();
             throw new \Exception($sf->faultstring, 500);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500, $e);
