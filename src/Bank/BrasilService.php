@@ -8,7 +8,7 @@
 
 namespace Boleto\Bank;
 
-
+use Boleto\Helper\Helper;
 use Boleto\Entity\Juros;
 use Boleto\Entity\Multa;
 use Boleto\Entity\Pagador;
@@ -430,11 +430,11 @@ class BrasilService implements InterfaceBank
 
             $titulo->addChild('codigoTipoInscricaoPagador', $this->pagador->getTipoDocumento() === 'CPF' ? 1 : 2);
             $titulo->addChild('numeroInscricaoPagador', $this->pagador->getDocumento());
-            $titulo->addChild('nomePagador', $this->pagador->getNome());
-            $titulo->addChild('textoEnderecoPagador', $this->pagador->getLogradouro() . ' ' . $this->pagador->getNumero());
+            $titulo->addChild('nomePagador', substr(Helper::ascii($this->pagador->getNome()), 0,60));
+            $titulo->addChild('textoEnderecoPagador', substr(Helper::ascii($this->pagador->getLogradouro() . ' ' . $this->pagador->getNumero()), 0, 60));
             $titulo->addChild('numeroCepPagador', $this->pagador->getCep());
-            $titulo->addChild('nomeMunicipioPagador', $this->pagador->getCidade());
-            $titulo->addChild('nomeBairroPagador', $this->pagador->getBairro());
+            $titulo->addChild('nomeMunicipioPagador', substr(Helper::ascii($this->pagador->getCidade()), 0,20));
+            $titulo->addChild('nomeBairroPagador', substr(Helper::ascii($this->pagador->getBairro()), 0, 20));
             $titulo->addChild('siglaUfPagador', $this->pagador->getUf());
             $titulo->addChild('textoNumeroTelefonePagador', $this->pagador->getTelefone());
 
@@ -451,7 +451,9 @@ class BrasilService implements InterfaceBank
             $this->setLinhadigitavel($result->linhaDigitavel);
 
         } catch (\SoapFault $sf) {
-            $a = $client->__getLastRequest();
+            //$time = time();
+            //file_put_contents ('c:/resquest_' . $time. '.txt', print_r($client->__getLastRequest(), true));
+            //file_put_contents ('c:/response_' . $time. '.txt', print_r($client->__getLastResponse(), true));
             throw new \Exception($sf->faultstring, 500);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500, $e);
