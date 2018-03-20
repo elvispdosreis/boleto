@@ -15,6 +15,7 @@ use Boleto\Entity\Juros;
 use Boleto\Entity\Multa;
 use Boleto\Entity\Pagador;
 use Boleto\Exception\InvalidArgumentException;
+use Boleto\Helper\Helper;
 use Cache\Adapter\Apcu\ApcuCachePool;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -372,7 +373,7 @@ class BradescoService implements InterfaceBank
             $arr->cdProduto = '0';
             $arr->nuTitulo = (string)$this->getNossoNumero();
             $arr->nuCliente = (string)$this->getNossoNumero();
-            $arr->dtEmissaoTitulo = $this->getVencimento()->format('d.m.Y');
+            $arr->dtEmissaoTitulo = $this->getEmissao()->format('d.m.Y');
             $arr->dtVencimentoTitulo = $this->getVencimento()->format('d.m.Y');
             $arr->tpVencimento = '0';
             $arr->vlNominalTitulo = (string)number_format($this->getValor(), 2, '', '');
@@ -398,18 +399,18 @@ class BradescoService implements InterfaceBank
             $arr->dtLimiteBonificacao = '';
             $arr->vlAbatimento = '0';
             $arr->vlIOF = '0';
-            $arr->nomePagador = $this->pagador->getNome();
-            $arr->logradouroPagador = $this->pagador->getLogradouro();
+            $arr->nomePagador = substr(Helper::ascii($this->pagador->getNome()), 0, 40);
+            $arr->logradouroPagador = substr(Helper::ascii($this->pagador->getLogradouro()), 0, 40);
             $arr->nuLogradouroPagador = $this->pagador->getNumero();
-            $arr->complementoLogradouroPagador = $this->pagador->getComplemento();
+            $arr->complementoLogradouroPagador = substr(Helper::ascii($this->pagador->getComplemento()), 0, 15);
             $arr->cepPagador = $this->pagador->getCepPrefixo();
             $arr->complementoCepPagador = $this->pagador->getCepSufixo();
-            $arr->bairroPagador = $this->pagador->getBairro();
-            $arr->municipioPagador = $this->pagador->getCidade();
-            $arr->ufPagador = $this->pagador->getUf();
+            $arr->bairroPagador = substr(Helper::ascii($this->pagador->getBairro()), 0, 40);
+            $arr->municipioPagador = substr(Helper::ascii($this->pagador->getCidade()), 0, 30);
+            $arr->ufPagador = substr(Helper::ascii($this->pagador->getUf()), 0, 2);
             $arr->cdIndCpfcnpjPagador = $this->pagador->getTipoDocumento() === 'CPF' ? '1' : '2';
             $arr->nuCpfcnpjPagador = $this->pagador->getDocumento();
-            $arr->endEletronicoPagador = $this->pagador->getEmail();
+            $arr->endEletronicoPagador = substr(Helper::ascii($this->pagador->getEmail()), 0, 50);
             $arr->nomeSacadorAvalista = '';
             $arr->logradouroSacadorAvalista = '';
             $arr->nuLogradouroSacadorAvalista = '0';
@@ -462,6 +463,8 @@ class BradescoService implements InterfaceBank
             }
 
             $json = json_encode($arr);
+
+            print_r($json);
 
             $base64 = $this->certificado->signText($json);
 
