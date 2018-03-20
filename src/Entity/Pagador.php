@@ -9,6 +9,8 @@
 
 namespace Boleto\Entity;
 
+use Boleto\Helper\Helper;
+
 class Pagador
 {
 
@@ -269,6 +271,24 @@ class Pagador
     {
         $this->email = $email;
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCepPrefixo()
+    {
+        $cep = Helper::number($this->getCep());
+        return substr($cep, 0, 5);
+    }
+
+    /**
+     * @return string
+     */
+    public function getCepSufixo()
+    {
+        $cep = Helper::number($this->getCep());
+        return substr($cep, 5, 3);
     }
 
 }
