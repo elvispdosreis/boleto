@@ -464,8 +464,6 @@ class BradescoService implements InterfaceBank
 
             $json = json_encode($arr);
 
-            print_r($json);
-
             $base64 = $this->certificado->signText($json);
 
 
