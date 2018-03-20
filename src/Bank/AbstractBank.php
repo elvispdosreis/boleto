@@ -237,7 +237,7 @@ class AbstractBank
         } else return '';
     }
 
-    public function getCodigoBarrasBase64($codigo = null, $altura = 50, $espmin = 1.7)
+    public function getCodigoBarrasBase64($codigo = null, $altura = 49.3, $espmin = 1)
     {
         if (is_null($codigo)) {
             $codigo = $this->getCodigoBarras();
