@@ -9,12 +9,15 @@
 namespace Boleto\Bank;
 
 
+use Boleto\Entity\Beneficiario;
+use Boleto\Entity\Certificado;
+use Boleto\Entity\Juros;
+use Boleto\Entity\Multa;
 use Boleto\Entity\Pagador;
+use Boleto\Exception\InvalidArgumentException;
 use Cache\Adapter\Apcu\ApcuCachePool;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
-use function GuzzleHttp\Psr7\str;
-use Meng\AsyncSoap\Guzzle\Factory;
+use GuzzleHttp\Exception\RequestException;
 
 class BradescoService implements InterfaceBank
 {
@@ -23,10 +26,11 @@ class BradescoService implements InterfaceBank
     /**
      * @var \DateTime
      */
+    private $emissao;
     private $vencimento;
     private $valor;
-    private $convenio;
-    private $variacaocarteira;
+    private $agencia;
+    private $conta;
     private $nossonumero;
     private $carteira;
     private $codigobarras;
@@ -37,21 +41,42 @@ class BradescoService implements InterfaceBank
      */
     private $pagador;
 
-    private $clientId;
-    private $secretId;
-    private $cache;
+    /**
+     * @var Beneficiario
+     */
+    private $beneficiario;
+
+    /**
+     * @var Certificado
+     */
+    private $certificado;
 
 
     /**
-     * BrasilService constructor.
+     * @var Juros
+     */
+    private $juros;
+
+    /**
+     * @var Multa
+     */
+    private $multa;
+
+    private $cache;
+
+    /**
+     * BradescoService constructor.
      * @param string $vencimento
      * @param string $valor
-     * @param string $convenio
-     * @param string $variacaocarteira
      * @param string $nossonumero
      * @param string $carteira
+     * @param string $agencia
+     * @param string $conta
+     * @param Pagador $pagador
+     * @param Beneficiario $beneficiario
+     * @param Certificado $certificado
      */
-    public function __construct(\DateTime $vencimento = null, $valor = null, $nossonumero = null, $carteira = null, $convenio = null, $variacaocarteira = null, Pagador $pagador = null, $clientId = null, $secredId = null)
+    public function __construct(\DateTime $vencimento = null, $valor = null, $nossonumero = null, $carteira = null, $agencia = null, $conta = null, Pagador $pagador = null, Beneficiario $beneficiario = null, Certificado $certificado = null)
     {
         $this->cache = new ApcuCachePool();
 
@@ -59,16 +84,26 @@ class BradescoService implements InterfaceBank
         $this->valor = $valor;
         $this->nossonumero = $nossonumero;
         $this->carteira = $carteira;
-        $this->convenio = $convenio;
-        $this->variacaocarteira = $variacaocarteira;
+        $this->agencia = $agencia;
+        $this->conta = $conta;
         $this->pagador = $pagador;
-        $this->clientId = $clientId;
-        $this->secretId = $secredId;
+        $this->beneficiario = $beneficiario;
+        $this->certificado = $certificado;
     }
 
     /**
      * @param \DateTime $date
-     * @return BrasilService
+     * @return BradescoService
+     */
+    public function setEmissao(\DateTime $date)
+    {
+        $this->emissao = $date;
+        return $this;
+    }
+
+    /**
+     * @param \DateTime $date
+     * @return BradescoService
      */
     public function setVencimento(\DateTime $date)
     {
@@ -78,7 +113,7 @@ class BradescoService implements InterfaceBank
 
     /**
      * @param double $valor
-     * @return BrasilService
+     * @return BradescoService
      */
     public function setValor($valor)
     {
@@ -88,7 +123,7 @@ class BradescoService implements InterfaceBank
 
     /**
      * @param int $nossonumero
-     * @return BrasilService
+     * @return BradescoService
      */
     public function setNossoNumero($nossonumero)
     {
@@ -97,28 +132,28 @@ class BradescoService implements InterfaceBank
     }
 
     /**
-     * @param int $convenio
-     * @return BrasilService
+     * @param int $agencia
+     * @return BradescoService
      */
-    public function setConvenio($convenio)
+    public function setAgencia($agencia)
     {
-        $this->convenio = $convenio;
+        $this->agencia = $agencia;
         return $this;
     }
 
     /**
-     * @param int $variacaocarteira
-     * @return BrasilService
+     * @param int $conta
+     * @return BradescoService
      */
-    public function setVariacaoCarteira($variacaocarteira)
+    public function setConta($conta)
     {
-        $this->variacaocarteira = $variacaocarteira;
+        $this->conta = $conta;
         return $this;
     }
 
     /**
      * @param int $carteira
-     * @return BrasilService
+     * @return BradescoService
      */
     public function setCarteira($carteira)
     {
@@ -128,7 +163,7 @@ class BradescoService implements InterfaceBank
 
     /**
      * @param Pagador $pagador
-     * @return BrasilService
+     * @return BradescoService
      */
     public function setPagador(Pagador $pagador = null)
     {
@@ -137,46 +172,25 @@ class BradescoService implements InterfaceBank
     }
 
     /**
-     * @param string $clientId
-     * @return BrasilService
+     * @param Beneficiario $pagador
+     * @return BradescoService
      */
-    public function setClientId($clientId)
+    public function setBeneficiario(Beneficiario $beneficiario = null)
     {
-        $this->clientId = $clientId;
+        $this->beneficiario = $beneficiario;
         return $this;
     }
 
     /**
-     * @param string $clientId
-     * @return BrasilService
+     * @param $certificado Certificado
+     * @return BradescoService
      */
-    public function setSecretId($secretId)
+    public function setCertificado(Certificado $certificado)
     {
-        $this->secretId = $secretId;
+        $this->certificado = $certificado;
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    private function getClientId()
-    {
-        if (is_null($this->clientId)) {
-            throw new \InvalidArgumentException('O parâmetro clientId nulo.');
-        }
-        return $this->clientId;
-    }
-
-    /**
-     * @return string
-     */
-    private function getSecretId()
-    {
-        if (is_null($this->clientId)) {
-            throw new \InvalidArgumentException('O parâmetro secretId nulo.');
-        }
-        return $this->secretId;
-    }
 
     /**
      * @param string $codigobarras
@@ -192,6 +206,17 @@ class BradescoService implements InterfaceBank
     private function setLinhadigitavel($linhadigitavel)
     {
         $this->linhadigitavel = $linhadigitavel;
+    }
+
+    /**
+     * @param \DateTime
+     */
+    public function getEmissao()
+    {
+        if (is_null($this->emissao)) {
+            throw new \InvalidArgumentException('Data Emissäo inválido.');
+        }
+        return $this->emissao;
     }
 
     public function getVencimento()
@@ -210,7 +235,7 @@ class BradescoService implements InterfaceBank
         if (is_null($this->carteira)) {
             throw new \InvalidArgumentException('Carteira inválido.');
         }
-        return $this->carteira;
+        return str_pad($this->carteira, 2, "0", STR_PAD_LEFT);
     }
 
     /**
@@ -254,90 +279,110 @@ class BradescoService implements InterfaceBank
     /**
      * @return string
      */
-    private function getConvenio()
+    private function getAgencia()
     {
-        if (is_null($this->convenio)) {
-            throw new \InvalidArgumentException('Convênio inválido.');
+        if (is_null($this->agencia)) {
+            throw new \InvalidArgumentException('Agência inválido.');
         }
-        return $this->convenio;
+        return $this->agencia;
     }
 
     /**
      * @return string
      */
-    private function getVariacaCarteira()
+    private function getConta()
     {
-        if (is_null($this->variacaocarteira)) {
-            throw new \InvalidArgumentException('Variação Carteira inválido.');
+        if (is_null($this->conta)) {
+            throw new \InvalidArgumentException('Conta inválido.');
         }
-        return $this->variacaocarteira;
+        return $this->conta;
     }
+
+    /**
+     * @return Juros
+     */
+    public function getJuros(): Juros
+    {
+        return $this->juros;
+    }
+
+    /**
+     * @param Juros $juros
+     * @return BradescoService
+     */
+    public function setJuros(Juros $juros): BradescoService
+    {
+        $this->juros = $juros;
+        return $this;
+    }
+
+    /**
+     * @return Multa
+     */
+    public function getMulta(): Multa
+    {
+        return $this->multa;
+    }
+
+    /**
+     * @param Multa $multa
+     * @return BradescoService
+     */
+    public function setMulta(Multa $multa): BradescoService
+    {
+        $this->multa = $multa;
+        return $this;
+    }
+
+    /**
+     * @return Certificado
+     */
+    private function getCertificado()
+    {
+        return $this->certificado;
+    }
+
+    /**
+     * @return string
+     */
+    private function getNumeroNegociacao()
+    {
+        return $this->agencia . str_pad($this->conta, 14, "0", STR_PAD_LEFT);
+    }
+
 
     public function send()
     {
 
         try {
 
-            $token = $this->getToken();
-
-            $httpHeaders = [
-                'http' => [
-                    'protocol_version' => 1.1,
-                    'header' => "Authorization: Bearer " . $token . "\r\n" . "Cache-Control: no-cache"
-                ],
-                'ssl' => [
-                    'verify_peer_name' => false,
-                    'allow_self_signed' => true
-                ]
-            ];
-
-            $context = stream_context_create($httpHeaders);
-
-            $client = new \SoapClient(dirname(__FILE__) . '/../XSD/RegistroCobrancaService.xml',
-                [
-                    'trace' => TRUE,
-                    'exceptions' => TRUE,
-                    'encoding' => 'UTF-8',
-                    'compression' => \SOAP_COMPRESSION_ACCEPT | \SOAP_COMPRESSION_GZIP,
-                    'cache_wsdl' => WSDL_CACHE_NONE,
-                    'connection_timeout' => 15,
-                    'stream_context' => $context
-                ]
-            );
-
-
             $arr = new \stdClass();
-            $arr->nuCPFCNPJ = '123456789';
-            $arr->filialCPFCNPJ = '0001';
-            $arr->ctrlCPFCNPJ = '39';
+            $arr->nuCPFCNPJ = $this->beneficiario->getDocumentoRaiz();
+            $arr->filialCPFCNPJ = $this->beneficiario->getDocumentoFilial();
+            $arr->ctrlCPFCNPJ = $this->beneficiario->getDocumentoControle();
             $arr->cdTipoAcesso = '2';
             $arr->clubBanco = '0';
             $arr->cdTipoContrato = '0';
             $arr->nuSequenciaContrato = '0';
-            $arr->idProduto = '09';
-            $arr->nuNegociacao = '123400000001234567';
+            $arr->idProduto = (string)$this->getCarteira();
+            $arr->nuNegociacao = $this->getNumeroNegociacao();
             $arr->cdBanco = '237';
             $arr->eNuSequenciaContrato = '0';
             $arr->tpRegistro = '1';
             $arr->cdProduto = '0';
-            $arr->nuTitulo = '0';
-            $arr->nuCliente = '123456';
+            $arr->nuTitulo = (string)$this->getNossoNumero();
+            $arr->nuCliente = (string)$this->getNossoNumero();
             $arr->dtEmissaoTitulo = $this->getVencimento()->format('d.m.Y');
             $arr->dtVencimentoTitulo = $this->getVencimento()->format('d.m.Y');
             $arr->tpVencimento = '0';
-            $arr->vlNominalTitulo = $this->getValor();
-            $arr->cdEspecieTitulo = '04';
+            $arr->vlNominalTitulo = (string)$this->getValor();
+            $arr->cdEspecieTitulo = '99';
             $arr->tpProtestoAutomaticoNegativacao = '0';
             $arr->prazoProtestoAutomaticoNegativacao = '0';
             $arr->controleParticipante = '';
             $arr->cdPagamentoParcial = '';
             $arr->qtdePagamentoParcial = '0';
-            $arr->percentualJuros = '0';
-            $arr->vlJuros = '0';
-            $arr->qtdeDiasJuros = '0';
-            $arr->percentualMulta = '0';
-            $arr->vlMulta = '0';
-            $arr->qtdeDiasMulta = '0';
+
             $arr->percentualDesconto1 = '0';
             $arr->vlDesconto1 = '0';
             $arr->dataLimiteDesconto1 = '';
@@ -357,12 +402,12 @@ class BradescoService implements InterfaceBank
             $arr->logradouroPagador = $this->pagador->getLogradouro();
             $arr->nuLogradouroPagador = $this->pagador->getNumero();
             $arr->complementoLogradouroPagador = $this->pagador->getComplemento();
-            $arr->cepPagador = '12345';
-            $arr->complementoCepPagador = '500';
+            $arr->cepPagador = $this->pagador->getCepPrefixo();
+            $arr->complementoCepPagador = $this->pagador->getCepSufixo();
             $arr->bairroPagador = $this->pagador->getBairro();
             $arr->municipioPagador = $this->pagador->getCidade();
-            $arr->ufPagador = 'SP';
-            $arr->cdIndCpfcnpjPagador = '1';
+            $arr->ufPagador = $this->pagador->getUf();
+            $arr->cdIndCpfcnpjPagador = $this->pagador->getTipoDocumento() === 'CPF' ? '1' : '2';
             $arr->nuCpfcnpjPagador = $this->pagador->getDocumento();
             $arr->endEletronicoPagador = $this->pagador->getEmail();
             $arr->nomeSacadorAvalista = '';
@@ -379,55 +424,77 @@ class BradescoService implements InterfaceBank
             $arr->endEletronicoSacadorAvalista = '';
 
 
-            if ($result->codigoRetornoPrograma !== 0) {
-                throw new \Exception(trim($result->textoMensagemErro));
+            $multa = $this->multa;
+            if (!is_null($this->multa)) {
+                $interval_multa = date_diff($this->getVencimento(), $multa->getData());
+                $arr->percentualMulta = str_pad(number_format($multa->getPercentual(), 5, '', ' '), 8, "0", STR_PAD_LEFT);
+                $arr->vlMulta = '0';
+                $arr->qtdeDiasMulta = $interval_multa->format('%a');
+            } else {
+                $arr->percentualMulta = '0';
+                $arr->vlMulta = '0';
+                $arr->qtdeDiasMulta = '0';
             }
 
-            $this->setCodigobarras($result->codigoBarraNumerico);
-            $this->setLinhadigitavel($result->linhaDigitavel);
 
-        } catch (\SoapFault $sf) {
-            throw new \Exception($sf->faultstring, 500);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        }
+            $juros = $this->juros;
+            if (!is_null($this->juros)) {
+                $interval_juros = date_diff($this->getVencimento(), $juros->getData());
+                if ($juros->getTipo() === $this->juros::Isento) {
+                    $arr->percentualJuros = '0';
+                    $arr->vlJuros = '0';
+                    $arr->qtdeDiasJuros = '0';
+                } elseif ($juros->getTipo() === $this->juros::Diario) {
+                    $arr->percentualJuros = str_pad(number_format($juros->getValor(), 5, '', ' '), 8, "0", STR_PAD_LEFT);
+                    $arr->vlJuros = '0';
+                    $arr->qtdeDiasJuros = $interval_juros->format('%a');
+                } elseif ($juros->getTipo() === $this->juros::Mensal) {
+                    $arr->percentualJuros = str_pad(number_format($juros->getValor(), 5, '', ' '), 8, "0", STR_PAD_LEFT);
+                    $arr->vlJuros = '0';
+                    $arr->qtdeDiasJuros = $interval_juros->format('%a');
+                } else {
+                    throw new \InvalidArgumentException('Código do tipo de juros inválido.');
+                }
+            } else {
+                $arr->percentualJuros = '0';
+                $arr->vlJuros = '0';
+                $arr->qtdeDiasJuros = '0';
+            }
 
-    }
+            $json = json_encode($arr);
 
-    private function getToken()
-    {
-        try {
+            $base64 = $this->certificado->signText($json);
 
-            $key = sha1('boleto-bb' . $this->convenio);
 
-            $item = $this->cache->getItem($key);
-            if (!$item->isHit()) {
-                $client = new Client(['auth' => [$this->getClientId(), $this->getSecretId()]]);
-                $res = $client->request('POST', 'https://oauth.hm.bb.com.br/oauth/token', [
-                    'headers' => [
-                        'Content-Type' => 'application/x-www-form-urlencoded',
-                        'Cache-Control' => 'no-cache'
-                    ],
-                    'body' => 'grant_type=client_credentials&scope=cobranca.registro-boletos'
-                ]);
+            $client = new Client(['verify' => false]);
+            $res = $client->request('POST', 'https://cobranca.bradesconetempresa.b.br/ibpjregistrotitulows/registrotitulo', [
+                'body' => $base64
+            ]);
 
-                if ($res->getStatusCode() === 200) {
-                    $json = $res->getBody()->getContents();
-                    $arr = \GuzzleHttp\json_decode($json);
+            if ($res->getStatusCode() === 200) {
+                $retorno = $res->getBody()->getContents();
+                $doc = new \DOMDocument();
+                $doc->loadXML($retorno);
+                $retorno = $doc->getElementsByTagName('return')->item(0)->nodeValue;
+                $retorno = preg_replace('/, }/i', '}', $retorno);
+                $retorno = json_decode($retorno);
+                if (!empty($retorno->cdErro)) {
+                    throw new InvalidArgumentException($retorno->cdErro, trim($retorno->msgErro));
 
-                    $item->set($arr->access_token);
-                    $item->expiresAfter($arr->expires_in);
-                    $this->cache->saveDeferred($item);
-                    return $item->get();
                 }
 
-                return null;
-
+                $this->setLinhadigitavel($retorno->linhaDigitavel);
+                $this->setCodigobarras($retorno->cdBarras);
             }
-            return $item->get();
+
+
+        } catch (RequestException $e) {
+            echo $e->getMessage() . PHP_EOL;
+
 
         } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), $e->getCode());
+            echo $e->getMessage() . PHP_EOL;;
         }
+
     }
 }
