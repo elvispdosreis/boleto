@@ -375,7 +375,7 @@ class BradescoService implements InterfaceBank
             $arr->dtEmissaoTitulo = $this->getVencimento()->format('d.m.Y');
             $arr->dtVencimentoTitulo = $this->getVencimento()->format('d.m.Y');
             $arr->tpVencimento = '0';
-            $arr->vlNominalTitulo = (string)$this->getValor();
+            $arr->vlNominalTitulo = (string)number_format($this->getValor(), 2, '', '');
             $arr->cdEspecieTitulo = '99';
             $arr->tpProtestoAutomaticoNegativacao = '0';
             $arr->prazoProtestoAutomaticoNegativacao = '0';
@@ -427,7 +427,7 @@ class BradescoService implements InterfaceBank
             $multa = $this->multa;
             if (!is_null($this->multa)) {
                 $interval_multa = date_diff($this->getVencimento(), $multa->getData());
-                $arr->percentualMulta = str_pad(number_format($multa->getPercentual(), 5, '', ' '), 8, "0", STR_PAD_LEFT);
+                $arr->percentualMulta = str_pad(number_format($multa->getPercentual(), 5, '', ''), 8, "0", STR_PAD_LEFT);
                 $arr->vlMulta = '0';
                 $arr->qtdeDiasMulta = $interval_multa->format('%a');
             } else {
@@ -445,11 +445,11 @@ class BradescoService implements InterfaceBank
                     $arr->vlJuros = '0';
                     $arr->qtdeDiasJuros = '0';
                 } elseif ($juros->getTipo() === $this->juros::Diario) {
-                    $arr->percentualJuros = str_pad(number_format($juros->getValor(), 5, '', ' '), 8, "0", STR_PAD_LEFT);
+                    $arr->percentualJuros = str_pad(number_format($juros->getValor(), 5, '', ''), 8, "0", STR_PAD_LEFT);
                     $arr->vlJuros = '0';
                     $arr->qtdeDiasJuros = $interval_juros->format('%a');
                 } elseif ($juros->getTipo() === $this->juros::Mensal) {
-                    $arr->percentualJuros = str_pad(number_format($juros->getValor(), 5, '', ' '), 8, "0", STR_PAD_LEFT);
+                    $arr->percentualJuros = str_pad(number_format($juros->getValor(), 5, '', ''), 8, "0", STR_PAD_LEFT);
                     $arr->vlJuros = '0';
                     $arr->qtdeDiasJuros = $interval_juros->format('%a');
                 } else {
