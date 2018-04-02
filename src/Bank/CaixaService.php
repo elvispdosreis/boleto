@@ -9,12 +9,13 @@
 namespace Boleto\Bank;
 
 
-use Boleto\Helper\Helper;
 use Boleto\Entity\Beneficiario;
+use Boleto\Entity\Desconto;
 use Boleto\Entity\Juros;
 use Boleto\Entity\Multa;
 use Boleto\Entity\Pagador;
 use Boleto\Exception\InvalidArgumentException;
+use Boleto\Helper\Helper;
 use Boleto\Service\CaixaSoapCliente;
 
 
@@ -54,6 +55,11 @@ class CaixaService implements InterfaceBank
      * @var Multa
      */
     private $multa;
+
+    /**
+     * @var Desconto[]
+     */
+    private $desconto = [];
 
     /**
      * CaixaService constructor.
@@ -280,6 +286,24 @@ class CaixaService implements InterfaceBank
     }
 
     /**
+     * @return Desconto[]
+     */
+    public function getDesconto(): Desconto
+    {
+        return $this->desconto;
+    }
+
+    /**
+     * @param Desconto $desconto
+     * @return CaixaService
+     */
+    public function setDesconto(Desconto $desconto): CaixaService
+    {
+        array_push($this->desconto, $desconto);
+        return $this;
+    }
+
+    /**
      * @return int
      */
     public function getPrazoDevolucao()
@@ -334,6 +358,27 @@ class CaixaService implements InterfaceBank
                 $multa = $titulo->addChild('MULTA');
                 $multa->addChild('DATA', $this->multa->getData()->format('Y-m-d'));
                 $multa->addChild('PERCENTUAL', $this->multa->getPercentual());
+            }
+
+
+            if (count($this->desconto) > 0) {
+                if (count($this->desconto) > 3) {
+                    throw new \InvalidArgumentException('Quantidade desconto informado maior que 3.');
+                }
+                //$descontos = $titulo->addChild('DESCONTOS');
+                foreach ($this->desconto as $desconto) {
+                    if ($desconto->getTipo() === $desconto::Valor) {
+                        $desc = $titulo->addChild('DESCONTOS');
+                        $desc->addChild('DATA', $desconto->getData()->format('Y-m-d'));
+                        $desc->addChild('VALOR', $desconto->getValor());
+                    } elseif ($desconto->getTipo() === $desconto::Percentual) {
+                        $desc = $titulo->addChild('DESCONTOS');
+                        $desc->addChild('DATA', $desconto->getData()->format('Y-m-d'));
+                        $desc->addChild('PERCENTUAL', $desconto->getValor());
+                    } else {
+                        throw new \InvalidArgumentException('Código do tipo de desconto inválido.');
+                    }
+                }
             }
 
             if (!is_null($this->juros)) {
