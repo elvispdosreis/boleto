@@ -8,6 +8,7 @@
 
 namespace Boleto\Bank;
 
+use Boleto\Entity\Desconto;
 use Boleto\Helper\Helper;
 use Boleto\Entity\Juros;
 use Boleto\Entity\Multa;
@@ -49,6 +50,11 @@ class BrasilService implements InterfaceBank
      * @var Multa
      */
     private $multa;
+
+    /**
+     * @var Desconto[]
+     */
+    private $desconto = [];
 
     private $clientId;
     private $secretId;
@@ -347,6 +353,24 @@ class BrasilService implements InterfaceBank
         return $this;
     }
 
+    /**
+     * @return Desconto[]
+     */
+    public function getDesconto(): Desconto
+    {
+        return $this->desconto;
+    }
+
+    /**
+     * @param Desconto $desconto
+     * @return BrasilService
+     */
+    public function setDesconto(Desconto $desconto): BrasilService
+    {
+        array_push($this->desconto, $desconto);
+        return $this;
+    }
+
 
     public function send()
     {
@@ -391,7 +415,29 @@ class BrasilService implements InterfaceBank
             $titulo->addChild('dataEmissaoTitulo', $this->getEmissao()->format('d.m.Y'));
             $titulo->addChild('dataVencimentoTitulo', $this->getVencimento()->format('d.m.Y'));
             $titulo->addChild('valorOriginalTitulo', $this->getValor());
-            $titulo->addChild('codigoTipoDesconto', '');
+
+
+            if (count($this->desconto) > 0) {
+                if (count($this->desconto) > 1) {
+                    throw new \InvalidArgumentException('Quantidade desconto informado maior que 1.');
+                }
+                foreach ($this->desconto as $desconto) {
+                    if ($desconto->getTipo() === $desconto::Valor) {
+                        $titulo->addChild('codigoTipoDesconto', '1');
+                        $titulo->addChild('dataDescontoTitulo', $desconto->getData()->format('d.m.Y'));
+                        $titulo->addChild('valorDescontoTitulo', $desconto->getValor());
+                    } elseif ($desconto->getTipo() === $desconto::Percentual) {
+                        $titulo = $titulo->addChild('codigoTipoDesconto', '2');
+                        $titulo->addChild('dataDescontoTitulo', $desconto->getData()->format('d.m.Y'));
+                        $titulo->addChild('percentualDescontoTitulo', $desconto->getValor());
+                    } else {
+                        throw new \InvalidArgumentException('Código do tipo de desconto inválido.');
+                    }
+                }
+            }
+            else{
+                $titulo->addChild('codigoTipoDesconto', '');
+            }
 
 
             $multa = $this->multa;
@@ -451,9 +497,9 @@ class BrasilService implements InterfaceBank
             $this->setLinhadigitavel($result->linhaDigitavel);
 
         } catch (\SoapFault $sf) {
-            //$time = time();
-            //file_put_contents ('c:/resquest_' . $time. '.txt', print_r($client->__getLastRequest(), true));
-            //file_put_contents ('c:/response_' . $time. '.txt', print_r($client->__getLastResponse(), true));
+            $time = time();
+            file_put_contents ('c:/resquest_' . $time. '.txt', print_r($client->__getLastRequest(), true));
+            file_put_contents ('c:/response_' . $time. '.txt', print_r($client->__getLastResponse(), true));
             throw new \Exception($sf->faultstring, 500);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500, $e);

@@ -11,6 +11,7 @@ namespace Boleto\Bank;
 
 use Boleto\Entity\Beneficiario;
 use Boleto\Entity\Certificado;
+use Boleto\Entity\Desconto;
 use Boleto\Entity\Juros;
 use Boleto\Entity\Multa;
 use Boleto\Entity\Pagador;
@@ -62,6 +63,11 @@ class BradescoService implements InterfaceBank
      * @var Multa
      */
     private $multa;
+
+    /**
+     * @var Desconto[]
+     */
+    private $desconto = [];
 
     private $cache;
 
@@ -336,6 +342,24 @@ class BradescoService implements InterfaceBank
     }
 
     /**
+     * @return Desconto[]
+     */
+    public function getDesconto(): Desconto
+    {
+        return $this->desconto;
+    }
+
+    /**
+     * @param Desconto $desconto
+     * @return BradescoService
+     */
+    public function setDesconto(Desconto $desconto): BradescoService
+    {
+        array_push($this->desconto, $desconto);
+        return $this;
+    }
+
+    /**
      * @return Certificado
      */
     private function getCertificado()
@@ -393,6 +417,7 @@ class BradescoService implements InterfaceBank
             $arr->percentualDesconto3 = '0';
             $arr->vlDesconto3 = '0';
             $arr->dataLimiteDesconto3 = '';
+
             $arr->prazoBonificacao = '0';
             $arr->percentualBonificacao = '0';
             $arr->vlBonificacao = '0';
@@ -461,6 +486,24 @@ class BradescoService implements InterfaceBank
                 $arr->vlJuros = '0';
                 $arr->qtdeDiasJuros = '0';
             }
+
+            if (count($this->desconto) > 0) {
+                if (count($this->desconto) > 3) {
+                    throw new \InvalidArgumentException('Quantidade desconto informado maior que 3.');
+                }
+                foreach ($this->desconto as $x => $desconto) {
+                    if ($desconto->getTipo() === $desconto::Valor) {
+                        $arr->{'dataLimiteDesconto' . ($x + 1)} = $desconto->getData()->format('d.m.Y');
+                        $arr->{'vlDesconto' . ($x + 1)} = str_pad(number_format($desconto->getValor(), 5, '', ''), 8, "0", STR_PAD_LEFT);
+                    } elseif ($desconto->getTipo() === $desconto::Percentual) {
+                        $arr->{'dataLimiteDesconto' . ($x + 1)} = $desconto->getData()->format('d.m.Y');
+                        $arr->{'percentualDesconto' . ($x + 1)} = str_pad(number_format($desconto->getValor(), 5, '', ''), 8, "0", STR_PAD_LEFT);
+                    } else {
+                        throw new \InvalidArgumentException('Código do tipo de desconto inválido.');
+                    }
+                }
+            }
+
 
             $json = json_encode($arr);
 
