@@ -434,7 +434,7 @@ class BradescoService implements InterfaceBank
             $arr->municipioPagador = substr(Helper::ascii($this->pagador->getCidade()), 0, 30);
             $arr->ufPagador = substr(Helper::ascii($this->pagador->getUf()), 0, 2);
             $arr->cdIndCpfcnpjPagador = $this->pagador->getTipoDocumento() === 'CPF' ? '1' : '2';
-            $arr->nuCpfcnpjPagador = $this->pagador->getDocumento();
+            $arr->nuCpfcnpjPagador = Helper::number($this->pagador->getDocumento());
             $arr->endEletronicoPagador = substr(Helper::ascii($this->pagador->getEmail()), 0, 50);
             $arr->nomeSacadorAvalista = '';
             $arr->logradouroSacadorAvalista = '';
