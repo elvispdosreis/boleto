@@ -365,7 +365,6 @@ class CaixaService implements InterfaceBank
                 if (count($this->desconto) > 3) {
                     throw new \InvalidArgumentException('Quantidade desconto informado maior que 3.');
                 }
-                //$descontos = $titulo->addChild('DESCONTOS');
                 foreach ($this->desconto as $desconto) {
                     if ($desconto->getTipo() === $desconto::Valor) {
                         $desc = $titulo->addChild('DESCONTOS');
@@ -429,12 +428,16 @@ class CaixaService implements InterfaceBank
             $endereco->addChild('UF', Helper::ascii($this->pagador->getUf()));
             $endereco->addChild('CEP', Helper::number($this->pagador->getCep()));
 
-
             $arr = json_decode(json_encode((array)$xml), 1);
 
-            $result = $client->__soapCall("INCLUI_BOLETO", [$arr]);
+            $descontos = &$arr["DADOS"]["INCLUI_BOLETO"]["TITULO"]["DESCONTOS"];
+            if(isset($descontos["DATA"])){
+                $descontos = [$descontos];
+            }
 
-            //file_put_contents('C:/home/tmp/' . $this->getNossoNumero() . '.txt', print_r($result, true));
+            //file_put_contents('C:/home/tmp/' . $this->getNossoNumero() . '.txt', print_r($arr, true));
+
+            $result = $client->__soapCall("INCLUI_BOLETO", [$arr]);
 
             if (!isset($result->DADOS->CONTROLE_NEGOCIAL)) {
                 throw new InvalidArgumentException($result->COD_RETORNO, trim($result->RETORNO));
