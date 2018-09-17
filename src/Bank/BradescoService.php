@@ -426,7 +426,7 @@ class BradescoService implements InterfaceBank
             $arr->vlIOF = '0';
             $arr->nomePagador = substr(Helper::ascii($this->pagador->getNome()), 0, 40);
             $arr->logradouroPagador = substr(Helper::ascii($this->pagador->getLogradouro()), 0, 40);
-            $arr->nuLogradouroPagador = $this->pagador->getNumero();
+            $arr->nuLogradouroPagador = (string)$this->pagador->getNumero();
             $arr->complementoLogradouroPagador = substr(Helper::ascii($this->pagador->getComplemento()), 0, 15);
             $arr->cepPagador = $this->pagador->getCepPrefixo();
             $arr->complementoCepPagador = $this->pagador->getCepSufixo();
