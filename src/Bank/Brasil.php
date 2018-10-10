@@ -9,7 +9,7 @@
 namespace Boleto\Bank;
 
 
-class Brasil extends AbstractBank
+class Brasil extends AbstractBank implements InterfaceBank
 {
     public $vencimento = '';
     public $valor = '';
@@ -27,189 +27,167 @@ class Brasil extends AbstractBank
     public $carteira = '06';
     public $nummoeda = "9";
 
-    function __construct(){
+
+    function __construct(\DateTime $vencimento = null, $valor = null, $nossonumero = null, $carteira = null, $agencia = null, $conta = null, $convenio = null, $contrato = null)
+    {
+        $this->setVencimento($vencimento);
+        $this->setValor($valor);
+        $this->setNossoNumero($nossonumero);
+        $this->setCarteira($carteira);
+        $this->setAgencia($agencia);
+        $this->setConta($conta);
+        $this->setConvenio($convenio);
+        $this->setContrato($contrato);
     }
 
-    function calcular(){
+    public function setVencimento(\DateTime $date)
+    {
+        $this->vencimento = $date;
+        return $this;
+    }
 
-        $codigo_banco_com_dv = $this->geraCodigoBanco($this->codigobanco);
+    public function setValor($valor)
+    {
+        $this->valor = $valor;
+        return $this;
+    }
 
-        $this->vencimento = $this->fator_vencimento($this->vencimento);
+    public function setNossoNumero($nossonumero)
+    {
+        $this->nossonumero = $nossonumero;
+        return $this;
+    }
 
-        //valor tem 10 digitos, sem virgula
-        $this->valor = $this->formata_numero(number_format($this->valor, 2, ',', ''),10,0,"valor");
-        //agencia é sempre 4 digitos
-        $this->agencia = $this->formata_numero($this->agencia,4,0);
-        //conta é sempre 8 digitos
-        $this->conta = $this->formata_numero($this->conta,8,0);
-        //agencia e conta
-        $agencia_codigo = $this->agencia."-". $this->modulo_11($this->agencia) ." / ". $this->conta ."-". $this->modulo_11($this->conta);
-        //Zeros: usado quando convenio de 7 digitos
-        $livre_zeros='000000';
+    public function setCarteira($carteira)
+    {
+        $this->carteira = $carteira;
+        return $this;
+    }
 
-        // Carteira 18 com Convênio de 8 dígitos
+    public function setAgencia($agencia)
+    {
+        //agencia é 4 digitos
+        $this->agencia = $this->formata_numero($agencia, 4, 0);
+        return $this;
+    }
+
+    public function getAgencia()
+    {
+        return $this->agencia . "-" . $this->agenciadigito . " / " . $this->contacedente . "-" . $this->contacedentedigito;
+    }
+
+    public function setConta($conta)
+    {
+        $this->conta = $this->formata_numero($conta, 8, 0);
+        return $this;
+    }
+
+    public function setConvenio($convenio)
+    {
+        $this->convenio = $convenio;
+        return $this;
+    }
+
+    public function setContrato($contrato)
+    {
+        $this->contrato = $contrato;
+        return $this;
+    }
+
+    public function getVencimento()
+    {
+        return $this->vencimento;
+    }
+
+    public function getCarteira()
+    {
+        // TODO: Implement getCarteira() method.
+    }
+
+    public function getValor()
+    {
+        return $this->valor;
+    }
+
+    public function getNossoNumero()
+    {
         if ($this->formatacaoconvenio == "8") {
             $this->convenio = $this->formata_numero($this->convenio,8,0,"convenio");
-            // Nosso número de até 9 dígitos
             $this->nossonumero = $this->formata_numero($this->nossonumero,9,0);
-            $dv=$this->modulo_11("$this->codigobanco$this->nummoeda$this->vencimento$this->valor$livre_zeros$this->convenio$this->nossonumero$this->carteira");
-            $linha="$this->codigobanco$this->nummoeda$dv$this->vencimento$this->valor$livre_zeros$this->convenio$this->nossonumero$this->carteira";
-            //montando o nosso numero que aparecerá no boleto
             $this->nossonumero = $this->convenio . $this->nossonumero ."-". $this->modulo_11($this->convenio.$this->nossonumero);
         }
-
         // Carteira 18 com Convênio de 7 dígitos
         if ($this->formatacaoconvenio == "7") {
             $this->convenio = $this->formata_numero($this->convenio,7,0,"convenio");
-            // Nosso número de até 10 dígitos
             $this->nossonumero = $this->formata_numero($this->nossonumero,10,0);
-
-            $dv=$this->modulo_11("$this->codigobanco$this->nummoeda$this->vencimento$this->valor$livre_zeros$this->convenio$this->nossonumero$this->carteira");
-            $linha="$this->codigobanco$this->nummoeda$dv$this->vencimento$this->valor$livre_zeros$this->convenio$this->nossonumero$this->carteira";
             $this->nossonumero = $this->convenio.$this->nossonumero;
-            //Não existe DV na composição do nosso-número para convênios de sete posições
         }
-
         // Carteira 18 com Convênio de 6 dígitos
         if ($this->formatacaoconvenio == "6") {
             $this->convenio = $this->formata_numero($this->convenio,6,0,"convenio");
-
             if ($this->formatacaonossonumero == "1") {
-
-                // Nosso número de até 5 dígitos
-                $this->nossonumero = $this->formata_numero($this->nossonumero,5,0);
-                $dv = $this->modulo_11("$this->codigobanco$this->nummoeda$this->vencimento$this->valor$this->convenio$this->nossonumero$this->agencia$this->conta$this->carteira");
-                $linha = "$this->codigobanco$this->nummoeda$dv$this->vencimento$this->valor$this->convenio$this->nossonumero$this->agencia$this->conta$this->carteira";
-                //montando o nosso numero que aparecerá no boleto
                 $this->nossonumero = $this->convenio . $this->nossonumero ."-". $this->modulo_11($this->convenio.$this->nossonumero);
             }
+            if ($this->formatacaonossonumero == "2") {
+                $this->nossonumero = $this->formata_numero($this->nossonumero,17,0);
+            }
+        }
+        return $this->nossonumero;
+    }
 
+    public function getLinhaDigitavel()
+    {
+        return $this->linhaDigitavel($this->getCodigoBarras());
+    }
+
+    public function getCodigoBarras()
+    {
+        $valor = $this->getValorBoleto();
+        $fatorvencimento = $this->fatorVencimento($this->vencimento);
+
+        $codigobarras = '';
+
+        // Convênio de 7 dígitos
+        if (strlen($this->contrato) == "7") {
+            $this->convenio = $this->formata_numero($this->convenio, 7, 0, "convenio");
+            // Nosso número de até 10 dígitos
+            $this->nossonumero = $this->formata_numero($this->nossonumero, 10, 0);
+            $dv = $this->dvBarra($this->codigobanco . $this->nummoeda . $fatorvencimento . $valor . '000000' . $this->contrato . $this->nossonumero . $this->carteira);
+            $codigobarras = $this->codigobanco . $this->nummoeda . $dv . $fatorvencimento . $valor . '000000' . $this->contrato . $this->nossonumero . $this->carteira;
+        }
+
+        /*
+        // Carteira 18 com Convênio de 8 dígitos
+        if (strlen($this->contrato) == "8") {
+            $this->convenio = $this->formata_numero($this->convenio, 8, 0, "convenio");
+            // Nosso número de até 9 dígitos
+            $this->nossonumero = $this->formata_numero($this->nossonumero, 9, 0);
+            $dv = $this->dvBarra($this->codigobanco . $this->nummoeda . $fatorvencimento . $this->valor . '000000' . $this->contrato . $this->nossonumero . $this->carteira);
+            $codigobarras = $this->codigobanco . $this->nummoeda . $dv . $fatorvencimento . $valor . '000000' . $this->contrato . $this->nossonumero . $this->carteira;
+        }
+
+        // Carteira 18 com Convênio de 6 dígitos
+        if (strlen($this->contrato) == "6") {
+            $this->convenio = $this->formata_numero($this->convenio, 6, 0, "convenio");
+            if ($this->formatacaonossonumero == "1") {
+                // Nosso número de até 5 dígitos
+                $this->nossonumero = $this->formata_numero($this->nossonumero, 5, 0);
+                $dv = $this->dvBarra($this->codigobanco . $this->nummoeda . $fatorvencimento . $valor . $this->contrato . $this->nossonumero . $this->agencia . $this->conta . $this->carteira);
+                $codigobarras = $this->codigobanco . $this->nummoeda . $dv . $fatorvencimento . $valor . $this->contrato . $this->nossonumero . $this->agencia . $this->conta . $this->carteira;
+            }
             if ($this->formatacaonossonumero == "2") {
                 // Nosso número de até 17 dígitos
-                $nservico = "21";
-                $this->nossonumero = $this->formata_numero($this->nossonumero,17,0);
-                $dv = $this->modulo_11("$this->codigobanco$this->nummoeda$this->vencimento$this->valor$this->convenio$this->nossonumero$nservico");
-                $linha = "$this->codigobanco$this->nummoeda$dv$this->vencimento$this->valor$this->convenio$this->nossonumero$nservico";
+                $this->nossonumero = $this->formata_numero($this->nossonumero, 10, 0);
+                $dv = $this->dvBarra($this->codigobanco . $this->nummoeda . $fatorvencimento . $valor . $this->contrato . $this->nossonumero);
+                $codigobarras = $this->codigobanco . $this->nummoeda . $dv . $fatorvencimento . $valor . $this->contrato . $this->nossonumero;
             }
         }
-
-        return array('nossonumero'=>$this->nossonumero, 'codigobarras'=>$linha, 'linhadigitavel'=>$this->monta_linha_digitavel($linha), 'agencia_codigo'=>$agencia_codigo, 'codigo_banco_com_dv'=>$codigo_banco_com_dv);
+        */
+        return $codigobarras;
     }
 
-    protected function modulo_10($num) {
-        $numtotal10 = 0;
-        $fator = 2;
-
-        for ($i = strlen($num); $i > 0; $i--) {
-            $numeros[$i] = substr($num,$i-1,1);
-            $parcial10[$i] = $numeros[$i] * $fator;
-            $numtotal10 .= $parcial10[$i];
-            if ($fator == 2) {
-                $fator = 1;
-            }
-            else {
-                $fator = 2;
-            }
-        }
-
-        $soma = 0;
-        for ($i = strlen($numtotal10); $i > 0; $i--) {
-            $numeros[$i] = substr($numtotal10,$i-1,1);
-            $soma += $numeros[$i];
-        }
-        $resto = $soma % 10;
-        $digito = 10 - $resto;
-        if ($resto == 0) {
-            $digito = 0;
-        }
-
-        return $digito;
+    private function getValorBoleto()
+    {
+        return $this->formata_numero(number_format($this->valor, 2, ',', ''),10,0,"valor");
     }
-
-    protected function modulo_11($num, $base=9, $r=0) {
-        $soma = 0;
-        $fator = 2;
-        for ($i = strlen($num); $i > 0; $i--) {
-            $numeros[$i] = substr($num,$i-1,1);
-            $parcial[$i] = $numeros[$i] * $fator;
-            $soma += $parcial[$i];
-            if ($fator == $base) {
-                $fator = 1;
-            }
-            $fator++;
-        }
-        if ($r == 0) {
-            $soma *= 10;
-            $digito = $soma % 11;
-
-            //corrigido
-            if ($digito == 10) {
-                $digito = "X";
-            }
-
-            if (strlen($num) == "43") {
-                //então estamos checando a linha digitável
-                if ($digito == "0" or $digito == "X" or $digito > 9) {
-                    $digito = 1;
-                }
-            }
-            return $digito;
-        }
-        elseif ($r == 1){
-            $resto = $soma % 11;
-            return $resto;
-        }
-    }
-
-    /*
-    Montagem da linha digitável - Função tirada do PHPBoleto
-    Não mudei nada
-    */
-    protected function monta_linha_digitavel($linha) {
-        // Posição 	Conteúdo
-        // 1 a 3    Número do banco
-        // 4        Código da Moeda - 9 para Real
-        // 5        Digito verificador do Código de Barras
-        // 6 a 19   Valor (12 inteiros e 2 decimais)
-        // 20 a 44  Campo Livre definido por cada banco
-
-        // 1. Campo - composto pelo código do banco, código da moéda, as cinco primeiras posições
-        // do campo livre e DV (modulo10) deste campo
-        $p1 = substr($linha, 0, 4);
-        $p2 = substr($linha, 19, 5);
-        $p3 = $this->modulo_10("$p1$p2");
-        $p4 = "$p1$p2$p3";
-        $p5 = substr($p4, 0, 5);
-        $p6 = substr($p4, 5);
-        $campo1 = "$p5.$p6";
-
-        // 2. Campo - composto pelas posiçoes 6 a 15 do campo livre
-        // e livre e DV (modulo10) deste campo
-        $p1 = substr($linha, 24, 10);
-        $p2 = $this->modulo_10($p1);
-        $p3 = "$p1$p2";
-        $p4 = substr($p3, 0, 5);
-        $p5 = substr($p3, 5);
-        $campo2 = "$p4.$p5";
-
-        // 3. Campo composto pelas posicoes 16 a 25 do campo livre
-        // e livre e DV (modulo10) deste campo
-        $p1 = substr($linha, 34, 10);
-        $p2 = $this->modulo_10($p1);
-        $p3 = "$p1$p2";
-        $p4 = substr($p3, 0, 5);
-        $p5 = substr($p3, 5);
-        $campo3 = "$p4.$p5";
-
-        // 4. Campo - digito verificador do codigo de barras
-        $campo4 = substr($linha, 4, 1);
-
-        // 5. Campo composto pelo valor nominal pelo valor nominal do documento, sem
-        // indicacao de zeros a esquerda e sem edicao (sem ponto e virgula). Quando se
-        // tratar de valor zerado, a representacao deve ser 000 (tres zeros).
-        $campo5 = substr($linha, 5, 14);
-
-        return "$campo1 $campo2 $campo3 $campo4 $campo5";
-    }
-
 }
