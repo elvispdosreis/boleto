@@ -72,7 +72,6 @@ class AbstractBank
         return $this->demostrativo;
     }
 
-
     /**
      * @param string[] $instrucao
      * @return $this
@@ -90,9 +89,6 @@ class AbstractBank
     {
         return $this->instrucao;
     }
-
-    // protected $valor;
-    //protected $vencimento;
 
     protected function dvBarra($numero)
     {
@@ -313,6 +309,56 @@ class AbstractBank
         $dias = (int)$date->format('z') + 1;
         $year = $date->format('y');
         return str_pad($dias, 3, '0', STR_PAD_LEFT) . substr($year, -1);
+    }
+
+    protected function linhaDigitavel($codigo)
+    {
+        // 01-03    -> Código do banco sem o digito
+        // 04-04    -> Código da Moeda (9-Real)
+        // 05-05    -> Dígito verificador do código de barras
+        // 06-09    -> Fator de vencimento
+        // 10-19    -> Valor Nominal do Título
+        // 20-44    -> Campo Livre (Abaixo)
+        // 20-23    -> Código da Agencia (sem dígito)
+        // 24-05    -> Número da Carteira
+        // 26-36    -> Nosso Número (sem dígito)
+        // 37-43    -> Conta do Cedente (sem dígito)
+        // 44-44    -> Zero (Fixo)
+
+        // 1. Campo - composto pelo código do banco, código da moéda, as cinco primeiras posições
+        // do campo livre e DV (modulo10) deste campo
+
+        $p1 = substr($codigo, 0, 4);                            // Numero do banco + Carteira
+        $p2 = substr($codigo, 19, 5);                        // 5 primeiras posições do campo livre
+        $p3 = $this->modulo_10("$p1$p2");                        // Digito do campo 1
+        $p4 = "$p1$p2$p3";                                // União
+        $campo1 = substr($p4, 0, 5) . '.' . substr($p4, 5);
+
+        // 2. Campo - composto pelas posiçoes 6 a 15 do campo livre
+        // e livre e DV (modulo10) deste campo
+        $p1 = substr($codigo, 24, 10);                        //Posições de 6 a 15 do campo livre
+        $p2 = $this->modulo_10($p1);                                //Digito do campo 2
+        $p3 = "$p1$p2";
+        $campo2 = substr($p3, 0, 5) . '.' . substr($p3, 5);
+
+        // 3. Campo composto pelas posicoes 16 a 25 do campo livre
+        // e livre e DV (modulo10) deste campo
+        $p1 = substr($codigo, 34, 10);                        //Posições de 16 a 25 do campo livre
+        $p2 = $this->modulo_10($p1);                                //Digito do Campo 3
+        $p3 = "$p1$p2";
+        $campo3 = substr($p3, 0, 5) . '.' . substr($p3, 5);
+
+        // 4. Campo - digito verificador do codigo de barras
+        $campo4 = substr($codigo, 4, 1);
+
+        // 5. Campo composto pelo fator vencimento e valor nominal do documento, sem
+        // indicacao de zeros a esquerda e sem edicao (sem ponto e virgula). Quando se
+        // tratar de valor zerado, a representacao deve ser 000 (tres zeros).
+        $p1 = substr($codigo, 5, 4);
+        $p2 = substr($codigo, 9, 10);
+        $campo5 = "$p1$p2";
+
+        return "$campo1 $campo2 $campo3 $campo4 $campo5";
     }
 
     public function __destruct()
