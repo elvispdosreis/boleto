@@ -387,7 +387,7 @@ class BrasilEcommerce implements InterfaceBank
             ]);
 
             $body = $res->getBody()->getContents();
-            file_put_contents('I:/projetos/boleto/test/'.$this->getNossoNumero().'.pdf', $body);
+            //file_put_contents('I:/projetos/boleto/test/'.$this->getNossoNumero().'.pdf', $body);
             if ($res->getStatusCode() === 200) {
                 $json = $res->getBody()->getContents();
             }
