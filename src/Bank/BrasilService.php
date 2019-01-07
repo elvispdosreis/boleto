@@ -478,7 +478,7 @@ class BrasilService implements InterfaceBank
             $titulo->addChild('numeroInscricaoPagador', $this->pagador->getDocumento());
             $titulo->addChild('nomePagador', substr(Helper::ascii($this->pagador->getNome()), 0,60));
             $titulo->addChild('textoEnderecoPagador', substr(Helper::ascii($this->pagador->getLogradouro() . ' ' . $this->pagador->getNumero()), 0, 60));
-            $titulo->addChild('numeroCepPagador', $this->pagador->getCep());
+            $titulo->addChild('numeroCepPagador', substr(Helper::number($this->pagador->getCep()), 0,8));
             $titulo->addChild('nomeMunicipioPagador', substr(Helper::ascii($this->pagador->getCidade()), 0,20));
             $titulo->addChild('nomeBairroPagador', substr(Helper::ascii($this->pagador->getBairro()), 0, 20));
             $titulo->addChild('siglaUfPagador', $this->pagador->getUf());
