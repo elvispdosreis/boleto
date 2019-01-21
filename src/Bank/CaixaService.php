@@ -175,7 +175,7 @@ class CaixaService implements InterfaceBank
         if (is_null($this->emissao)) {
             throw new \InvalidArgumentException('Data Emissäo inválido.');
         }
-        return $this->vencimento;
+        return $this->emissao;
     }
 
     /**
