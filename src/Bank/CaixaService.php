@@ -348,7 +348,7 @@ class CaixaService implements InterfaceBank
             $titulo = $incluir->addChild('TITULO');
             $titulo->addChild('NOSSO_NUMERO', '14' . Helper::padLeft($this->getNossoNumero(), 15));
             $titulo->addChild('NUMERO_DOCUMENTO', substr($this->getNossoNumero(), -11));
-            $titulo->addChild('DATA_VENCIMENTO', $this->getEmissao()->format('Y-m-d'));
+            $titulo->addChild('DATA_VENCIMENTO', $this->getVencimento()->format('Y-m-d'));
             $titulo->addChild('VALOR', $this->getValor());
             $titulo->addChild('TIPO_ESPECIE', 99);
             $titulo->addChild('FLAG_ACEITE', 'N');
