@@ -16,16 +16,14 @@ use Boleto\Entity\Pagador;
 use Boleto\Exception\InvalidArgumentException;
 use Cache\Adapter\Apcu\ApcuCachePool;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
-use function GuzzleHttp\Psr7\str;
-use Meng\AsyncSoap\Guzzle\Factory;
+use DateTime, Exception, SoapClient, SoapFault, SimpleXMLElement;
 
 class BrasilService implements InterfaceBank
 {
 
 
     /**
-     * @var \DateTime
+     * @var Datetime
      */
     private $vencimento, $emissao;
     private $valor;
@@ -60,21 +58,27 @@ class BrasilService implements InterfaceBank
     private $secretId;
     private $cache;
 
+    private $sandbox = false;
+
 
     /**
      * BrasilService constructor.
-     * @param string $vencimento
-     * @param string $valor
-     * @param string $convenio
-     * @param string $variacaocarteira
-     * @param string $nossonumero
-     * @param string $carteira
+     * @param DateTime|null $vencimento
+     * @param null $valor
+     * @param null $nossonumero
+     * @param null $carteira
+     * @param null $convenio
+     * @param null $variacaocarteira
+     * @param Pagador|null $pagador
+     * @param null $clientId
+     * @param null $secredId
+     * @throws Exception
      */
-    public function __construct(\DateTime $vencimento = null, $valor = null, $nossonumero = null, $carteira = null, $convenio = null, $variacaocarteira = null, Pagador $pagador = null, $clientId = null, $secredId = null)
+    public function __construct(Datetime $vencimento = null, $valor = null, $nossonumero = null, $carteira = null, $convenio = null, $variacaocarteira = null, Pagador $pagador = null, $clientId = null, $secredId = null)
     {
         $this->cache = new ApcuCachePool();
 
-        $this->emissao = new \DateTime();
+        $this->emissao = new Datetime();
         $this->vencimento = $vencimento;
         $this->valor = $valor;
         $this->nossonumero = $nossonumero;
@@ -87,20 +91,20 @@ class BrasilService implements InterfaceBank
     }
 
     /**
-     * @param \DateTime $date
+     * @param Datetime $date
      * @return BrasilService
      */
-    public function setEmissao(\DateTime $date)
+    public function setEmissao(Datetime $date)
     {
         $this->emissao = $date;
         return $this;
     }
 
     /**
-     * @param \DateTime $date
+     * @param Datetime $date
      * @return BrasilService
      */
-    public function setVencimento(\DateTime $date)
+    public function setVencimento(Datetime $date)
     {
         $this->vencimento = $date;
         return $this;
@@ -225,7 +229,7 @@ class BrasilService implements InterfaceBank
     }
 
     /**
-     * @param \DateTime
+     * @param Datetime
      */
     public function getEmissao()
     {
@@ -236,7 +240,7 @@ class BrasilService implements InterfaceBank
     }
 
     /**
-     * @param \DateTime
+     * @param Datetime
      */
     public function getVencimento()
     {
@@ -371,6 +375,24 @@ class BrasilService implements InterfaceBank
         return $this;
     }
 
+    /**
+     * @return bool
+     */
+    public function isSandbox(): bool
+    {
+        return $this->sandbox;
+    }
+
+    /**
+     * @param bool $sandbox
+     * @return BrasilService
+     */
+    public function setSandbox(bool $sandbox): BrasilService
+    {
+        $this->sandbox = $sandbox;
+        return $this;
+    }
+
 
     public function send()
     {
@@ -393,7 +415,13 @@ class BrasilService implements InterfaceBank
 
             $context = stream_context_create($httpHeaders);
 
-            $client = new \SoapClient(dirname(__FILE__) . '/../XSD/Banco do Brasil/RegistroCobrancaService.xml',
+            if ($this->isSandbox()) {
+                $endpoint = 'https://cobranca.homologa.bb.com.br:7101/Processos/Ws/RegistroCobrancaService.serviceagent?wsdl';
+            } else {
+                $endpoint = 'https://cobranca.bb.com.br:7101/Processos/Ws/RegistroCobrancaService.serviceagent?wsdl';
+            }
+
+            $client = new SoapClient($endpoint,
                 [
                     'trace' => TRUE,
                     'exceptions' => TRUE,
@@ -405,7 +433,7 @@ class BrasilService implements InterfaceBank
                 ]
             );
 
-            $titulo = new \SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><Message/>');
+            $titulo = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><Message/>');
 
             $titulo->addChild('numeroConvenio', $this->getConvenio());
             $titulo->addChild('numeroCarteira', $this->getCarteira());
@@ -434,8 +462,7 @@ class BrasilService implements InterfaceBank
                         throw new \InvalidArgumentException('Código do tipo de desconto inválido.');
                     }
                 }
-            }
-            else{
+            } else {
                 $titulo->addChild('codigoTipoDesconto', '');
             }
 
@@ -476,10 +503,10 @@ class BrasilService implements InterfaceBank
 
             $titulo->addChild('codigoTipoInscricaoPagador', $this->pagador->getTipoDocumento() === 'CPF' ? 1 : 2);
             $titulo->addChild('numeroInscricaoPagador', $this->pagador->getDocumento());
-            $titulo->addChild('nomePagador', substr(Helper::ascii($this->pagador->getNome()), 0,60));
+            $titulo->addChild('nomePagador', substr(Helper::ascii($this->pagador->getNome()), 0, 60));
             $titulo->addChild('textoEnderecoPagador', substr(Helper::ascii($this->pagador->getLogradouro() . ' ' . $this->pagador->getNumero()), 0, 60));
-            $titulo->addChild('numeroCepPagador', substr(Helper::number($this->pagador->getCep()), 0,8));
-            $titulo->addChild('nomeMunicipioPagador', substr(Helper::ascii($this->pagador->getCidade()), 0,20));
+            $titulo->addChild('numeroCepPagador', substr(Helper::number($this->pagador->getCep()), 0, 8));
+            $titulo->addChild('nomeMunicipioPagador', substr(Helper::ascii($this->pagador->getCidade()), 0, 20));
             $titulo->addChild('nomeBairroPagador', substr(Helper::ascii($this->pagador->getBairro()), 0, 20));
             $titulo->addChild('siglaUfPagador', $this->pagador->getUf());
             $titulo->addChild('textoNumeroTelefonePagador', $this->pagador->getTelefone());
@@ -496,13 +523,10 @@ class BrasilService implements InterfaceBank
             $this->setCodigobarras($result->codigoBarraNumerico);
             $this->setLinhadigitavel($result->linhaDigitavel);
 
-        } catch (\SoapFault $sf) {
-            $time = time();
-            file_put_contents ('c:/resquest_' . $time. '.txt', print_r($client->__getLastRequest(), true));
-            file_put_contents ('c:/response_' . $time. '.txt', print_r($client->__getLastResponse(), true));
-            throw new \Exception($sf->faultstring, 500);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500, $e);
+        } catch (SoapFault $sf) {
+            throw new Exception($sf->faultstring, 500);
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage(), 500, $e);
         }
 
     }
@@ -513,10 +537,16 @@ class BrasilService implements InterfaceBank
 
             $key = sha1('boleto-bb' . $this->convenio);
 
+            if ($this->isSandbox()) {
+                $endpoint = 'https://oauth.hm.bb.com.br/oauth/token';
+            } else {
+                $endpoint = 'https://oauth.bb.com.br/oauth/token';
+            }
+
             $item = $this->cache->getItem($key);
             if (!$item->isHit()) {
                 $client = new Client(['auth' => [$this->getClientId(), $this->getSecretId()]]);
-                $res = $client->request('POST', 'https://oauth.bb.com.br/oauth/token', [
+                $res = $client->request('POST', $endpoint, [
                     'headers' => [
                         'Content-Type' => 'application/x-www-form-urlencoded',
                         'Cache-Control' => 'no-cache'
@@ -539,8 +569,8 @@ class BrasilService implements InterfaceBank
             }
             return $item->get();
 
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), $e->getCode());
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage(), $e->getCode());
         }
     }
 }
