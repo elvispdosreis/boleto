@@ -5,6 +5,8 @@
   "require": {
     "php": ">=7.0",
     "ext-apcu": "*",
+    "ext-soap": "*",
+    "ext-simplexml": "*",
     "psr/log": "^1.0",
     "guzzlehttp/guzzle": "^6.3",
     "meng-tian/async-soap-guzzle": "^0.2.4",
