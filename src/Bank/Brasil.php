@@ -111,6 +111,7 @@ class Brasil extends AbstractBank implements InterfaceBank
 
     public function getNossoNumero()
     {
+        /*
         if ($this->formatacaoconvenio == "8") {
             $this->convenio = $this->formata_numero($this->convenio,8,0,"convenio");
             $this->nossonumero = $this->formata_numero($this->nossonumero,9,0);
@@ -132,6 +133,7 @@ class Brasil extends AbstractBank implements InterfaceBank
                 $this->nossonumero = $this->formata_numero($this->nossonumero,17,0);
             }
         }
+        */
         return $this->nossonumero;
     }
 
