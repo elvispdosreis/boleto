@@ -525,13 +525,11 @@ class ShopFacilService implements InterfaceBank
             if ($res->getStatusCode() === 200) {
                 $retorno = $res->getBody()->getContents();
                 $retorno = json_decode($retorno);
-                if($retorno->status->codigo === 930051){
-                    throw new InvalidArgumentException($retorno->status->codigo, trim($retorno->status->mensagem));
-                }
+                
                 if($retorno->status->codigo === 9300514){
                     throw new InvalidArgumentException($retorno->status->codigo, trim($retorno->status->mensagem));
                 }
-                if($retorno->status->codigo === 9300574){
+                if($retorno->status->codigo === 9300574 || $retorno->status->codigo === 930051){
                     $boleto = new Bradesco($this->getVencimento(), $this->getValor(), $this->getNossoNumero(), $this->getCarteira(),$this->getAgencia(), $this->getConta(), $this->getConta());
                     $this->setLinhadigitavel($boleto->getLinhadigitavel());
                     $this->setCodigobarras($boleto->getCodigobarras());
