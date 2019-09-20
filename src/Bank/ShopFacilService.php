@@ -528,6 +528,9 @@ class ShopFacilService implements InterfaceBank
                 if($retorno->status->codigo === 930051){
                     throw new InvalidArgumentException($retorno->status->codigo, trim($retorno->status->mensagem));
                 }
+                if($retorno->status->codigo === 9300514){
+                    throw new InvalidArgumentException($retorno->status->codigo, trim($retorno->status->mensagem));
+                }
 
                 // $this->setLinhadigitavel($retorno->linhaDigitavel);
                 // $this->setCodigobarras($retorno->cdBarras);
