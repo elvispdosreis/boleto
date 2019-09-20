@@ -440,7 +440,7 @@ class ShopFacilService implements InterfaceBank
 
             $pagador = new \stdClass();
             $pagador->nome = substr(Helper::ascii($this->pagador->getNome()), 0, 150);
-            $pagador->documento = $this->pagador->getDocumento();
+            $pagador->documento = Helper::number($this->pagador->getDocumento());
             $pagador->tipo_documento = $this->pagador->getTipoDocumento() === 'CPF' ? '1' : '2';
             $pagador->endereco = $endereco;
 
@@ -531,11 +531,18 @@ class ShopFacilService implements InterfaceBank
                 if($retorno->status->codigo === 9300514){
                     throw new InvalidArgumentException($retorno->status->codigo, trim($retorno->status->mensagem));
                 }
+                if($retorno->status->codigo === 9300574){
+                    $boleto = new Bradesco($this->getVencimento(), $this->getValor(), $this->getNossoNumero(), $this->getCarteira(),$this->getAgencia(), $this->getConta(), $this->getConta());
+                    $this->setLinhadigitavel($boleto->getLinhadigitavel());
+                    $this->setCodigobarras($boleto->getCodigobarras());
+                }
 
                 // $this->setLinhadigitavel($retorno->linhaDigitavel);
                 // $this->setCodigobarras($retorno->cdBarras);
             } else if ($res->getStatusCode() === 201) {
                 $boleto = new Bradesco($this->getVencimento(), $this->getValor(), $this->getNossoNumero(), $this->getCarteira(),$this->getAgencia(), $this->getConta(), $this->getConta());
+                $this->setLinhadigitavel($boleto->getLinhadigitavel());
+                $this->setCodigobarras($boleto->getCodigobarras());
             }
 
         } catch (RequestException $e) {
