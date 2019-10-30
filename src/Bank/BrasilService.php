@@ -416,9 +416,16 @@ class BrasilService implements InterfaceBank
             $context = stream_context_create($httpHeaders);
 
             if ($this->isSandbox()) {
+                /* Problema de SSL no Endpoint
                 $endpoint = 'https://cobranca.homologa.bb.com.br:7101/Processos/Ws/RegistroCobrancaService.serviceagent?wsdl';
+                */
+                $endpoint = 'https://cobranca.homologa.bb.com.br:7101/Processos/Ws/RegistroCobrancaService.serviceagent?wsdl';
+                $endpoint = dirname(__FILE__) . '/../XSD/Banco do Brasil/RegistroCobrancaServiceHomologacao.xml';
             } else {
+                /* Problema de SSL no Endpoint
                 $endpoint = 'https://cobranca.bb.com.br:7101/Processos/Ws/RegistroCobrancaService.serviceagent?wsdl';
+                */
+                $endpoint = dirname(__FILE__) . '/../XSD/Banco do Brasil/RegistroCobrancaService.xml';
             }
 
             $client = new SoapClient($endpoint,
