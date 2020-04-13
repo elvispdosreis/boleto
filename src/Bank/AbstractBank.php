@@ -271,7 +271,9 @@ class AbstractBank
         ob_start();
         imagepng($im);
         $buffer = ob_get_clean();
-        ob_end_clean();
+        if (ob_get_contents()) {
+            ob_end_clean();
+        }
         imagedestroy($im);
         return base64_encode($buffer);
     }
@@ -298,7 +300,9 @@ class AbstractBank
         ob_start();
         imagepng($im);
         $buffer = ob_get_clean();
-        ob_end_clean();
+        if (ob_get_contents()) {
+            ob_end_clean();
+        }
         imagedestroy($im);
         return base64_encode($buffer);
 
