@@ -7,5 +7,4 @@ class Boleto
     public function __construct(InterfaceBank $boleto)
     {
     }
-
 }
