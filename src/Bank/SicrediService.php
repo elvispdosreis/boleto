@@ -2,6 +2,7 @@
 
 namespace Boleto\Bank;
 
+use Boleto\Entity\Beneficiario;
 use Boleto\Entity\Multa;
 use Boleto\Exception\InvalidArgumentException;
 use Boleto\Entity\Pagador;
@@ -21,8 +22,21 @@ class SicrediService implements InterfaceBank
     private $seuNumero;
     private $vencimento;
     private $valor;
-    private $desconto = [];
 
+
+    /**
+     * @var Pagador
+     */
+    private $pagador;
+
+    /**
+     * @var Beneficiario
+     */
+    private $beneficiario;
+
+    /**
+     * @var Juros
+     */
     private $juros;
 
     /**
@@ -30,12 +44,16 @@ class SicrediService implements InterfaceBank
      */
     private $multa;
 
+    /**
+     * @var Desconto[]
+     */
+    private $desconto = [];
+
     private $descontoAntecipado;
     private $mensagem;
     private $codigoMensagem;
     private $informativo;
 
-    private $pagador;
     private $cache;
 
     private $carteira;
