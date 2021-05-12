@@ -416,7 +416,8 @@ class SicrediService implements InterfaceBank
 
             if($e->hasResponse()) {
                 $error = json_decode($e->getResponse()->getBody()->getContents());
-                throw new \Exception("{$error->codigo} - {$error->mensagem}", $e->getCode());
+                $exception = new InvalidArgumentException($error->codigo, $error->mensagem);
+                throw new \Exception($error->mensagem, 406, $exception);
             } else {
                 throw new \Exception($e->getMessage(), $e->getCode());
             }
